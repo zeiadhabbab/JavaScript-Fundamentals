@@ -267,12 +267,139 @@
       align-items: stretch;
       gap: 10px;
     }
+
+
+    /* Mobile nav trigger + backdrop */
+    .mobile-menu {
+      position: fixed;
+      left: 12px;
+      top: 12px;
+      z-index: 60;
+      padding: 10px 12px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: var(--panel);
+      color: var(--ink);
+      cursor: pointer;
+      display: none;
+      /* shown on mobile below */
+    }
+
+    .backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, .45);
+      z-index: 55;
+    }
+
+    /* Improve code-tool buttons on touch */
+    .code-tools button {
+      padding: 6px 10px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: var(--panel);
+      color: var(--ink);
+      cursor: pointer;
+    }
+
+    pre code.editing {
+      outline: 2px dashed var(--accent);
+      outline-offset: 4px
+    }
+
+    /* Responsive */
+    @media (max-width: 900px) {
+      .mobile-menu {
+        display: inline-block
+      }
+
+      .layout {
+        grid-template-columns: 99% 1fr;
+      }
+
+      /* stack */
+      main {
+        padding: 72px 16px 80px 16px
+      }
+
+      /* space for top menu button */
+      header h1 {
+        font-size: 26px
+      }
+
+      h2 {
+        font-size: 20px
+      }
+
+      h3 {
+        font-size: 16px
+      }
+
+      /* Sections: full width, let them grow naturally */
+      section {
+        height: auto;
+        /* override your calc(100vh - 150px) */
+        padding: 16px;
+        margin-bottom: 16px;
+      }
+
+      .grid {
+        grid-template-columns: 1fr
+      }
+
+      /* single column cards */
+      .search input.toc-input {
+        width: 100%
+      }
+
+      .top {
+        right: 12px;
+        bottom: 12px;
+        padding: 8px 12px
+      }
+
+      /* Off-canvas nav */
+      nav#side-nav {
+        position: fixed;
+        z-index: 70;
+        top: 0;
+        left: 0;
+        width: min(86vw, 340px);
+        height: 100vh;
+        transform: translateX(-105%);
+        transition: transform .25s ease;
+        border-right: 1px solid var(--border);
+      }
+
+      nav#side-nav.open {
+        transform: translateX(0)
+      }
+
+      /* Make details summary larger for touch */
+      .toc summary,
+      .toc a {
+        padding: 10px 12px;
+      }
+    }
+
+    /* Tiny phones */
+    @media (max-width: 400px) {
+      pre {
+        font-size: 13px
+      }
+
+      .code-tools {
+        gap: 6px
+      }
+    }
   </style>
 </head>
 
 <body>
+  <button id="mobile-menu" class="mobile-menu" aria-controls="side-nav" aria-expanded="false">☰ Menu</button>
+  <div id="backdrop" class="backdrop" hidden></div>
   <div class="layout">
-    <nav>
+    <nav id="side-nav">
       <div class="search">
         <h2>Navigator</h2>
         <input id="toc-filter" class="toc-input" placeholder="Filter topics…" />
@@ -717,7 +844,8 @@ function processData(data) {
 
         <h4>Iteration: <code>.forEach()</code></h4>
         <p>Executes a provided function once for each array element. It's a modern replacement for a simple
-          <code>for</code> loop.</p>
+          <code>for</code> loop.
+        </p>
         <pre><code>const fruits = ['apple', 'banana', 'cherry'];
 fruits.forEach(fruit => {
   alert(`I love ${fruit}s!`);
@@ -1206,6 +1334,41 @@ req.onsuccess = () =&gt; console.log('DB ready');</code></pre>
           if (document.execCommand) document.execCommand('insertText', false, text);
         });
       });
+    })();
+  </script>
+
+  <script>
+    (function () {
+      const nav = document.getElementById('side-nav');
+      const btn = document.getElementById('mobile-menu');
+      const backdrop = document.getElementById('backdrop');
+      const links = nav.querySelectorAll('a[href^="#"]');
+
+      function openNav() {
+        nav.classList.add('open');
+        backdrop.hidden = false;
+        btn.setAttribute('aria-expanded', 'true');
+        // trap focus to nav for accessibility
+        nav.setAttribute('tabindex', '-1'); nav.focus();
+        document.body.style.overflow = 'hidden';
+      }
+      function closeNav() {
+        nav.classList.remove('open');
+        backdrop.hidden = true;
+        btn.setAttribute('aria-expanded', 'false');
+        document.body.style.overflow = '';
+      }
+
+      btn.addEventListener('click', () => {
+        if (nav.classList.contains('open')) closeNav(); else openNav();
+      });
+      backdrop.addEventListener('click', closeNav);
+      document.addEventListener('keyup', (e) => { if (e.key === 'Escape') closeNav(); });
+      links.forEach(a => a.addEventListener('click', closeNav)); // close after selecting a topic on mobile
+
+      // Optional: close nav if window resized to desktop
+      const mq = window.matchMedia('(min-width: 901px)');
+      mq.addEventListener('change', (e) => { if (e.matches) closeNav(); });
     })();
   </script>
 </body>

@@ -1,0 +1,1213 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>JavaScript Fundamentals – Course Notes</title>
+  <style>
+    :root {
+      --bg: #0b1020;
+      --panel: #0f1630;
+      --ink: #e7ecff;
+      --muted: #b8c0e0;
+      --accent: #7aa2ff;
+      --accent-2: #33d6a6;
+      --border: #26304d;
+      --code: #0b1226;
+      --surface: #202a4c;
+
+    }
+
+    html,
+    body {
+      margin: 0;
+      font: 16px/1.6 system-ui, -apple-system, Segoe UI, Roboto, Inter, Arial;
+      color: var(--ink);
+      background: var(--bg);
+      scroll-behavior: smooth;
+    }
+
+    a {
+      color: var(--accent);
+      text-decoration: none
+    }
+
+    a:hover {
+      text-decoration: underline
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 320px 1fr;
+      gap: 0;
+      min-height: 100%
+    }
+
+    nav {
+      position: sticky;
+      top: 0;
+      align-self: start;
+      height: 100svh;
+      overflow: auto;
+      background: var(--panel);
+      border-right: 1px solid var(--border);
+      padding: 18px 14px;
+    }
+
+    nav h2 {
+      margin: 0 0 10px 6px;
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: .2px
+    }
+
+    .search {
+      position: sticky;
+      top: 0;
+      background: var(--panel);
+      padding-bottom: 8px
+    }
+
+    .toc {
+      list-style: none;
+      margin: 10px 0 50px;
+      padding: 0
+    }
+
+    .toc>li {
+      margin-bottom: 10px
+    }
+
+    .toc a {
+      display: block;
+      padding: 6px 10px;
+      border-radius: 10px;
+      color: var(--muted)
+    }
+
+    .toc a.active {
+      background: rgba(122, 162, 255, .14);
+      color: var(--ink)
+    }
+
+    .toc details {
+      margin: 4px 0 6px 6px
+    }
+
+    .toc summary {
+      cursor: pointer;
+      padding: 6px 10px;
+      border-radius: 10px;
+      color: var(--muted)
+    }
+
+    .toc ol {
+      list-style: none;
+      padding-left: 14px;
+      margin: 6px 0
+    }
+
+    .toc ol a {
+      font-size: 14px
+    }
+
+    main {
+      padding: 32px 10vw 80px 48px
+    }
+
+    section {
+      padding-bottom: 28px;
+      margin-bottom: 28px;
+      border-bottom: 1px dashed var(--border);
+      background: var(--surface);
+      padding: 23px;
+      height: calc(100vh - 150px);
+      overflow: auto;
+      position: relative;
+    }
+
+    h1 {
+      font-size: 34px;
+      margin: .2em 0 .2em
+    }
+
+    h2 {
+      font-size: 24px;
+      margin: 1.6em 0 .4em
+    }
+
+    h3 {
+      font-size: 18px;
+      margin: 1.1em 0 .2em;
+      color: var(--muted)
+    }
+
+    p {
+      margin: .4em 0
+    }
+
+    .tip {
+      border-left: 3px solid var(--accent-2);
+      background: rgba(51, 214, 166, .08);
+      padding: 10px 12px;
+      border-radius: 8px;
+      margin: 10px 0
+    }
+
+    pre {
+      background: var(--code);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 14px;
+      overflow: auto;
+      position: relative;
+    }
+
+    code,
+    pre,
+    kbd {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace
+    }
+
+    .pill {
+      display: inline-block;
+      padding: 2px 8px;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      font-size: 12px;
+      color: var(--muted)
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 14px
+    }
+
+    .small {
+      font-size: 14px;
+      color: var(--muted)
+    }
+
+    footer {
+      color: var(--muted);
+      font-size: 13px;
+      margin-top: 36px
+    }
+
+    .top {
+      position: fixed;
+      right: 18px;
+      bottom: 18px;
+      background: var(--accent);
+      color: #091024;
+      border: none;
+      border-radius: 999px;
+      padding: 10px 14px;
+      cursor: pointer;
+      box-shadow: 0 10px 40px rgba(122, 162, 255, .35)
+    }
+
+    /* Light theme overrides */
+    [data-theme="light"] {
+      --bg: #f7f8fc;
+      --panel: #ffffff;
+      --ink: #0b1020;
+      --muted: #4a5568;
+      --accent: #1a56db;
+      --accent-2: #10b981;
+      --border: #e2e8f0;
+      --code: #f1f5f9;
+      --surface: #ffffff;
+    }
+
+    .search input.toc-input {
+      width: 93%;
+      padding: 8px 10px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: var(--code);
+      color: var(--ink);
+    }
+
+    .theme-toggle {
+      margin-top: 8px;
+      width: auto;
+      padding: 4px 6px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: transparent;
+      color: var(--ink);
+      cursor: pointer;
+      position: absolute;
+      top: -9px;
+      right: 0;
+    }
+
+    span.pagenum {
+      position: absolute;
+      right: 10px;
+      background: var(--bg);
+      padding: 5px 13px;
+      border-radius: 5px;
+      margin-bottom: 3px;
+      display: block;
+      top: 11px;
+    }
+
+    .code-tools {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      display: flex;
+      flex-direction: row;
+      align-content: space-around;
+      justify-content: center;
+      align-items: stretch;
+      gap: 10px;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="layout">
+    <nav>
+      <div class="search">
+        <h2>Navigator</h2>
+        <input id="toc-filter" class="toc-input" placeholder="Filter topics…" />
+        <button id="theme-toggle" class="theme-toggle" aria-label="Toggle color scheme">🌙 Dark</button>
+      </div>
+      <ul class="toc" id="toc">
+        <!-- PART 1 -->
+        <li><a href="#part1" class="active">PART 1 · An Introduction to JS</a>
+          <details open>
+            <summary>Fundamentals</summary>
+            <ol>
+              <li><a href="#hello-world">Hello, world!</a></li>
+              <li><a href="#code-structure">Code structure</a></li>
+              <li><a href="#use-strict">"use strict"</a></li>
+              <li><a href="#variables">Variables</a></li>
+              <li><a href="#data-types">Data types</a></li>
+              <li><a href="#interaction">Interaction: alert/prompt/confirm</a></li>
+              <li><a href="#type-conversions">Type Conversions</a></li>
+              <li><a href="#operators">Basic operators & maths</a></li>
+              <li><a href="#comparisons">Comparisons</a></li>
+              <li><a href="#conditionals">Conditionals: if / ?</a></li>
+              <li><a href="#logic">Logical operators</a></li>
+              <li><a href="#nullish">Nullish coalescing ??</a></li>
+              <li><a href="#loops">Loops: while / for</a></li>
+              <li><a href="#switch">switch</a></li>
+              <li><a href="#functions">Functions (declaration, params)</a></li>
+              <li><a href="#func-expr">Function expressions & callbacks</a></li>
+              <li><a href="#arrows">Arrow functions</a></li>
+            </ol>
+          </details>
+        </li>
+
+        <!-- PART 2 -->
+        <li><a href="#part2">PART 2 · Code Quality</a>
+          <details>
+            <summary>Practices</summary>
+            <ol>
+              <li><a href="#debugging">Debugging in the browser</a></li>
+              <li><a href="#style">Coding Style</a></li>
+            </ol>
+          </details>
+        </li>
+
+        <!-- PART 3 -->
+        <li><a href="#part3">PART 3 · Advanced Topics</a>
+          <details>
+            <summary>Language APIs</summary>
+            <ol>
+              <li><a href="#array-methods">Array methods</a></li>
+              <li><a href="#map-set">Map & Set</a></li>
+              <li><a href="#object-entries">Object.keys / values / entries</a></li>
+              <li><a href="#date-time">Date & time</a></li>
+              <li><a href="#json">JSON & toJSON</a></li>
+              <li><a href="#timers">setTimeout / setInterval</a></li>
+              <li><a href="#try-catch">Error handling</a></li>
+              <li><a href="#promises">Promises & async/await</a></li>
+              <li><a href="#promise-chaining">Promise chaining</a></li>
+              <li><a href="#promise-errors">Promise error handling</a></li>
+              <li><a href="#promise-api">Promise API</a></li>
+              <li><a href="#async-await">Async/await patterns</a></li>
+            </ol>
+          </details>
+        </li>
+
+        <!-- PART 4 -->
+        <li><a href="#part4">PART 4 · DOM</a>
+          <details>
+            <summary>Browser & DOM</summary>
+            <ol>
+              <li><a href="#browser-env">Browser environment & specs</a></li>
+              <li><a href="#dom-tree">DOM tree</a></li>
+              <li><a href="#walking">Walking the DOM</a></li>
+              <li><a href="#searching">Searching elements</a></li>
+              <li><a href="#node-props">Node properties</a></li>
+              <li><a href="#attrs-props">Attributes vs properties</a></li>
+              <li><a href="#modifying">Modifying the document</a></li>
+              <li><a href="#styles-classes">Styles & classes</a></li>
+              <li><a href="#events">Browser events</a></li>
+              <li><a href="#custom-events">Custom events</a></li>
+              <li><a href="#forms">Forms: properties & methods</a></li>
+            </ol>
+          </details>
+        </li>
+
+        <!-- PART 5 -->
+        <li><a href="#part5">PART 5 · Network Requests</a>
+          <details>
+            <summary>HTTP APIs</summary>
+            <ol>
+              <li><a href="#fetch">Fetch</a></li>
+              <li><a href="#formdata">FormData</a></li>
+              <li><a href="#fetch-api">Fetch API patterns</a></li>
+              <li><a href="#url">URL objects</a></li>
+              <li><a href="#xhr">XMLHttpRequest</a></li>
+            </ol>
+          </details>
+        </li>
+
+        <!-- PART 6 -->
+        <li><a href="#part6">PART 6 · Browser Storage</a>
+          <details>
+            <summary>Persistence</summary>
+            <ol>
+              <li><a href="#cookies">Cookies</a></li>
+              <li><a href="#storage">localStorage / sessionStorage</a></li>
+              <li><a href="#indexeddb">IndexedDB</a></li>
+            </ol>
+          </details>
+        </li>
+      </ul>
+      <div class="small">Tip: use the filter box to quickly jump to a topic.</div>
+    </nav>
+
+    <main>
+      <header>
+        <h1>JavaScript Fundamentals · Complete Notes & Examples</h1>
+        <p class="small">Each topic below gives a quick explanation and at least one example. Copy/paste and run in your
+          browser DevTools console (<kbd>F12</kbd> or <kbd>Ctrl/⌘+Shift+I</kbd>).</p>
+        <p class="pill">Beginner → Intermediate · ES2023-friendly</p>
+      </header>
+
+      <!-- PART 1 -->
+      <section id="part1">
+        <h2>PART 1 · An Introduction to JavaScript</h2>
+        <p>
+          JavaScript was initially created to “make web pages alive”.
+          <br><br>
+          The programs in this language are called scripts. They can be written right in a web page’s HTML and run
+          automatically as the page loads.
+          <br><br>
+          Scripts are provided and executed as plain text. They don’t need special preparation or compilation to run.
+        </p>
+        <h4>JavaScript is able to:</h4>
+        <ul>
+          <li>Add new HTML to the page, change the existing content, modify styles.</li>
+          <li>React to user actions, run on mouse clicks, pointer movements, key presses.</li>
+          <li>Send requests over the network to remote servers, download and upload files (so-called <a
+              href="https://en.wikipedia.org/wiki/Ajax_(programming)">AJAX</a></li>
+          <li>Get and set cookies, ask questions to the visitor, show messages.</li>
+          <li>Remember the data on the client-side (“local storage”).</li>
+        </ul>
+        <h4>What makes JavaScript unique?</h4>
+        <ul>
+          <li>Full integration with HTML/CSS.</li>
+          <li>Simple things are done simply.</li>
+          <li>Supported by all major browsers and enabled by default.</li>
+
+
+        </ul>
+      </section>
+
+      <section id="hello-world">
+        <h3>Hello, world!</h3>
+        <p>Use a <code>&lt;script&gt;</code> tag to run JavaScript on a page, or open the DevTools console and type code
+          directly.</p>
+        <pre><code>&lt;script type="text/javascript" &gt;
+  alert('Hello, world!');
+&lt;/script&gt;</code></pre>
+        <div class="tip">In HTML, put complex scripts in external <code>.js</code> files for caching and reuse.</div>
+        <pre><code>&lt;script type="text/javascript" src="script.js"&gt;&lt;/script&gt;</code>
+        </pre>
+
+      </section>
+
+      <section id="code-structure">
+        <h3>Code structure: statements, semicolons, comments</h3>
+        <p>Write one statement per line; semicolons are optional but recommended. Use <code>//</code> or
+          <code>/* ... */</code> for comments.
+        </p>
+        <pre><code>// Two statements:
+const msg = 'JS!'; 
+alert(msg);   // shows "JS!"</code></pre>
+      </section>
+
+      <section id="use-strict">
+        <h3>The modern mode: <code>"use strict"</code> (Should we use it?)</h3>
+        <p><code>"use strict"</code> enables safer, modern semantics (e.g., forbids accidental globals). Yes—use it at
+          the top of files.</p>
+        <pre><code>"use strict";
+x = 1; // ReferenceError in strict mode</code></pre>
+
+        <h4>Why using <code>"use strict"</code>?</h4>
+        <p>Enables stricter error checking, improves performance, and prepares for future language features.
+          It’s a good practice to use <code>"use strict"</code> in all your scripts.
+        </p>
+      </section>
+
+      <section id="variables">
+        <h3>Variables</h3>
+        <p>Use <code>let</code> for reassignable bindings, <code>const</code> for constants. Prefer clear, descriptive
+          names.</p>
+        <pre><code>const TAX_RATE = 0.18;
+let subtotal = 100;
+let total = subtotal * (1 + TAX_RATE);</code></pre>
+
+        <h4>Variable naming</h4>
+        <ul>
+          <li>Use <code>camelCase</code> for multi-word names (e.g., <code>myVariable</code>).</li>
+          <li>Start with a letter, $, or _. Avoid numbers at the beginning.</li>
+          <li>Be descriptive but concise (e.g., <code>itemCount</code> instead of <code>ic</code>).</li>
+        </ul>
+      </section>
+
+      <section id="data-types">
+        <h3>Data types</h3>
+        <p>A value in JavaScript is always of a certain type. For example, a string or a number.</p>
+        <p>Primitives: number, string, boolean, null, undefined, bigint, symbol · Reference: object.</p>
+        <pre><code>typeof 42           // "number"
+typeof 'hi'         // "string"
+typeof null         // "object" (quirk)
+typeof {}           // "object"</code></pre>
+      </section>
+
+      <section id="interaction">
+        <h3>Interaction: <code>alert</code>, <code>prompt</code>, <code>confirm</code></h3>
+        <div class="">
+          <div>
+            <p>Use <code>alert</code> to show a message.</p>
+            <pre><code>alert('Heads up!');</code></pre>
+          </div>
+          <div>
+            <p>Use <code>prompt</code> to ask for input.</p>
+            <pre><code>const name = prompt('Your name?','');
+alert('Hi, ' + name + '!');</code></pre>
+          </div>
+          <div>
+            <p>Use <code>confirm</code> to ask for a yes/no answer.</p>
+            <pre><code>const ok = confirm('Continue?');
+alert(ok ? 'Proceeding' : 'Stopped');</code></pre>
+          </div>
+        </div>
+      </section>
+
+      <section id="type-conversions">
+        <h3>Type Conversions</h3>
+        <p>Convert explicitly with <code>Number(x)</code>, <code>String(x)</code>, <code>Boolean(x)</code>. Beware:
+          <code>+</code> concatenates if either side is a string.
+        </p>
+        <pre><code>Number(' 42 ')      // 42
+'4' + 2             // "42"  (concat)
+'4' - 2             // 2     (numeric)</code></pre>
+      </section>
+
+      <section id="operators">
+        <h3>Basic operators & maths</h3>
+        <p>Standard arithmetic, assignment, and exponentiation <code>**</code>. The unary <code>+</code> coerces to
+          number.</p>
+        <pre><code>+true     // 1
+2 ** 3    // 8 //exponentiation
+let x = 2; x *= 3 + 1; // 8 </code></pre>
+        <h4>Arithmetic operators</h4>
+        <ul>
+          <li>Addition <code>+</code>,</li>
+          <li>Subtraction <code>-</code>,</li>
+          <li>Multiplication <code>*</code>,</li>
+          <li>Division <code>/</code>,</li>
+          <li>Remainder <code>%</code>,</li>
+          <li>Exponentiation <code>**</code>.</li>
+        </ul>
+      </section>
+
+      <section id="comparisons">
+        <h3>Comparisons</h3>
+        <p>Use <code>===</code>/<code>!==</code> for strict checks (no type coercion). Strings compare
+          lexicographically.</p>
+        <pre><code>'Z' > 'A'         // true
+0 == false        // true
+0 === false       // false (strict)</code></pre>
+      </section>
+
+      <section id="conditionals">
+        <h3>Conditional branching: <code>if</code>, <code>?</code></h3>
+
+        <p>The if(...) statement evaluates a condition in parentheses and, if the result is true, executes a block of
+          code</p>
+        <p>For example:</p>
+        <pre>
+          <code>
+            if(age >= 18) {
+                console.log('adult');
+            } else {
+                console.log('minor');
+            }</code>
+        </pre>
+
+        <p>You can use the <code>?</code> operator for a shorter way to write an <code>if</code> statement. For example:
+        </p>
+        <pre><code>const age = 20;
+const label = age &gt;= 18 ? 'adult' : 'minor';</code></pre>
+      </section>
+
+      <section id="logic">
+        <h3>Logical operators: OR / AND / NOT</h3>
+        <p><code>||</code> returns the first truthy; <code>&amp;&amp;</code> returns the first falsy; <code>!</code>
+          negates.</p>
+        <pre><code>'' || 'fallback'     // "fallback"
+'hi' &amp;&amp; 123          // 123
+!0                   // true</code></pre>
+      </section>
+
+      <section id="nullish">
+        <h3>Nullish coalescing: <code>??</code></h3>
+        <p>Return the right side only when the left is <em>null</em> or <em>undefined</em> (unlike <code>||</code>,
+          which treats many values as “falsy”).</p>
+        <pre><code>const nick = null;
+nick ?? 'anonymous'    // "anonymous"
+0 ?? 5                 // 0 (kept)</code></pre>
+      </section>
+
+      <section id="loops">
+        <h3>Loops: <code>while</code>, <code>for</code></h3>
+        <pre><code>for (let i=1;i&lt;=5;i++) console.log(i); // 1..5
+let n=5; while(n) { n--; }</code></pre>
+
+        <pre>
+  <code>while (condition) {
+  // code
+  // so-called "loop body"
+}</code>
+
+<code>do {
+  // loop body
+} while (condition);</code>
+</pre>
+      </section>
+
+      <section id="switch">
+        <h3>The <code>switch</code> statement</h3>
+        <pre><code>const role = 'admin';
+switch (role) {
+  case 'user':  /* ... */ break;
+  case 'admin': /* ... */ break;
+  default:      /* ... */
+}</code></pre>
+      </section>
+
+      <!-- to do -->
+      <section id="functions">
+        <h3>Functions (declaration, local/outer vars, params, defaults)</h3>
+        <pre><code>function greet(name = 'friend'){ return `Hi, ${name}`; }
+greet();        // "Hi, friend"
+greet('Ava');   // "Hi, Ava"</code></pre>
+      </section>
+
+      <section id="func-expr">
+        <h3>Function expressions & callbacks</h3>
+        <pre><code>const twice = x =&gt; x*2;
+[1,2,3].map(twice); // [2,4,6]</code></pre>
+
+        <pre><code>let sayHi = function() {
+  alert( "Hello" );
+};</code></pre>
+      </section>
+
+      <section id="arrows">
+        <h3>Arrow functions, basics</h3>
+        <p>Concise syntax; lexical <code>this</code>.</p>
+        <pre><code>const add = (a,b) =&gt; a+b;
+const ids  = items =&gt; items.map(it =&gt; it.id);</code></pre>
+      </section>
+
+      <!-- PART 2 -->
+      <section id="part2">
+        <h2>PART 2 · Code Quality</h2>
+        <p>
+          Code quality in JavaScript refers to the overall standard and effectiveness of the codebase, encompassing its
+          readability, maintainability, reliability, security, and performance. High-quality code is easier to
+          understand, debug, modify, and extend, leading to more efficient development and reduced technical debt.
+        </p>
+      </section>
+
+      <section id="debugging">
+        <h3>Debugging in the browser</h3>
+
+        <p>
+          Debugging is the process of finding and fixing errors within a script. All modern browsers and most other
+          environments support debugging tools – a special UI in developer tools that makes debugging much easier. It
+          also allows to trace the code step by step to see what exactly is going on.
+
+          We’ll be using Chrome here, because it has enough features, most other browsers have a similar process.
+        </p>
+
+        <p>Open DevTools, use breakpoints, <code>console.log</code>, and the Sources panel to step through code.</p>
+
+        <pre><code>console.log({value, state});
+debugger; // triggers a breakpoint when DevTools is open</code></pre>
+      </section>
+
+      <section id="style">
+        <h3>Coding Style & Best Practices</h3>
+        <p>Writing clean, readable, and maintainable code is crucial. A consistent style helps prevent bugs and makes
+          collaboration easier.</p>
+
+        <h4>Variables and Naming</h4>
+        <p>Use <code>const</code> by default to prevent accidental reassignment. Use <code>let</code> only when you know
+          a variable needs to change. Name variables descriptively.</p>
+        <pre><code>// Good: Clear and immutable where possible
+const userProfile = await fetchUserProfile(userId);
+let retryCount = 0;
+
+// Avoid: Vague, mutable when it doesn't need to be
+var data = ...; // 'var' is legacy, prefer let/const
+var i = 0;      // 'i' is not descriptive
+</code></pre>
+
+        <h4>Functions</h4>
+        <p>Functions should be small and do one thing well (Single Responsibility Principle). Avoid deep nesting, which
+          makes code hard to follow.</p>
+        <pre><code>// Good: Clear, single purpose
+function isUserAdmin(user) {
+  return user.role === 'admin';
+}
+
+// Avoid: Too many nested levels
+function processData(data) {
+  if (data) {
+    if (data.items) {
+      // ... more nesting
+    }
+  }
+}</code></pre>
+
+        <h4>Tooling for Consistency</h4>
+        <p>Automated tools can format your code and catch common errors, ensuring consistency across your project.</p>
+        <ul>
+          <li><a href="https://prettier.io/" target="_blank">Prettier</a>: An opinionated code formatter that enforces a
+            consistent style.</li>
+          <li><a href="https://eslint.org/" target="_blank">ESLint</a>: A static analysis tool to find and fix problems
+            in your JavaScript code.</li>
+        </ul>
+      </section>
+
+      <!-- PART 3 -->
+      <section id="part3">
+        <h2>PART 3 · Advanced Topics</h2>
+      </section>
+
+      <section id="array-methods">
+        <h3>Array Methods</h3>
+        <p>Arrays come with a host of built-in methods to make common operations like iteration, transformation, and
+          filtering concise and readable.</p>
+
+        <h4>Iteration: <code>.forEach()</code></h4>
+        <p>Executes a provided function once for each array element. It's a modern replacement for a simple
+          <code>for</code> loop.</p>
+        <pre><code>const fruits = ['apple', 'banana', 'cherry'];
+fruits.forEach(fruit => {
+  alert(`I love ${fruit}s!`);
+});
+// Logs: "I love apples!", "I love bananas!", "I love cherrys!"</code></pre>
+
+        <h4>Transformation: <code>.map()</code></h4>
+        <p>Creates a <strong>new array</strong> populated with the results of calling a provided function on every
+          element in the calling array.</p>
+        <pre><code>const numbers = [1, 4, 9, 16];
+const roots = numbers.map(num => Math.sqrt(num));
+// roots is now [1, 2, 3, 4]
+alert(roots);
+// numbers is still [1, 4, 9, 16]
+alert(numbers);
+</code></pre>
+
+        <h4>Filtering: <code>.filter()</code></h4>
+        <p>Creates a <strong>new array</strong> with all elements that pass the test implemented by the provided
+          function.</p>
+        <pre><code>const ages = [32, 33, 16, 40];
+const adults = ages.filter(age => age >= 18);
+alert(adults);
+// adults is now [32, 33, 40]</code></pre>
+
+        <h4>Aggregation: <code>.reduce()</code></h4>
+        <p>Executes a "reducer" function on each element of the array, resulting in a single output value (e.g., a sum
+          or a flattened array).</p>
+        <pre><code>const numbers = [1, 2, 3, 4];
+const sum = numbers.reduce((accumulator, currentValue) => {
+  return accumulator + currentValue;
+}, 0); // 0 is the initial value for the accumulator
+alert(sum);
+// sum is 10</code></pre>
+
+        <h4>Finding Elements: <code>.find()</code> & <code>.some()</code></h4>
+        <p><code>.find()</code> returns the first element that satisfies a condition, while <code>.some()</code> returns
+          a boolean if at least one element satisfies it.</p>
+        <pre><code>const inventory = [ { name: 'apples', quantity: 2 }, { name: 'bananas', quantity: 0 }];
+const appleItem = inventory.find(item => item.name === 'apples'); // { name: 'apples', quantity: 2 }
+const hasOutOfStock = inventory.some(item => item.quantity === 0); // true
+alert(hasOutOfStock);
+
+</code></pre>
+      </section>
+
+      <section id="map-set">
+        <h3>Map and Set</h3>
+        <p><code>Map</code> and <code>Set</code> are modern, specialized data structures that offer more flexibility and
+          performance for certain tasks compared to plain Objects and Arrays.</p>
+
+        <h4>Map</h4>
+        <p>A <code>Map</code> is a collection of keyed data items, much like an <code>Object</code>. However, the main
+          difference is that <code>Map</code> allows keys of any type and maintains the insertion order.</p>
+        <pre><code>const userRoles = new Map();
+
+// Set key-value pairs
+const john = { name: 'John' };
+userRoles.set(john, 'Admin');
+userRoles.set('guest', 'Limited Access');
+
+// Get a value by key
+alert(userRoles.get(john)); // "Admin"
+
+// Check for existence
+  alert(userRoles.has('guest')); // true
+
+alert(userRoles.size); // 2</code></pre>
+
+        <h4>Set</h4>
+        <p>A <code>Set</code> is a special type of collection that only stores <strong>unique</strong> values. If you
+          add a value that already exists, it will be ignored.</p>
+        <pre><code>const uniqueNumbers = new Set();
+uniqueNumbers.add(1);
+uniqueNumbers.add(5);
+uniqueNumbers.add(5); // This duplicate is ignored
+uniqueNumbers.add(2);
+
+// A common use case: remove duplicates from an array
+const numbers = [2, 3, 4, 4, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7];
+const unique = [...new Set(numbers)]; // [2, 3, 4, 5, 6, 7];
+
+alert(unique);
+alert(unique.length); // 6
+</code></pre>
+      </section>
+
+      <section id="object-entries">
+        <h3>Object.keys / values / entries</h3>
+        <pre><code>const u = {id:7, name:'Sam'};
+Object.entries(u).forEach(([k,v]) =&gt; console.log(k,v));</code></pre>
+      </section>
+
+      <section id="date-time">
+        <h3>Date &amp; time</h3>
+        <pre><code>const d = new Date();
+d.toISOString();              // "2025-10-20T...Z"
+d.getFullYear();              // e.g., 2025</code></pre>
+      </section>
+
+      <section id="json">
+        <h3>JSON methods &amp; <code>toJSON</code></h3>
+        <pre><code>const obj = {a:1, b:2};
+const s = JSON.stringify(obj); // '{"a":1,"b":2}'
+JSON.parse(s).b;               // 2</code></pre>
+      </section>
+
+      <section id="timers">
+        <h3>Scheduling: <code>setTimeout</code> &amp; <code>setInterval</code></h3>
+        <pre><code>const id = setInterval(() =&gt; console.log('tick'), 1000);
+setTimeout(() =&gt; clearInterval(id), 3100);</code></pre>
+      </section>
+
+      <section id="try-catch">
+        <h3>Error handling, <code>try...catch</code></h3>
+        <pre><code>try {
+  JSON.parse('{bad json}');
+} catch (err) {
+  console.error('Oops:', err.message);
+}</code></pre>
+      </section>
+
+      <section id="promises">
+        <h3>Promises &amp; async/await</h3>
+        <pre><code>const delay = ms =&gt; new Promise(res =&gt; setTimeout(res, ms));
+(async () =&gt; {
+  await delay(300);
+  console.log('done');
+})();</code></pre>
+      </section>
+
+      <section id="promise-chaining">
+        <h3>Promise chaining</h3>
+        <pre><code>fetch('/api/user')
+  .then(r =&gt; r.json())
+  .then(user =&gt; fetch(`/api/profile/${user.id}`))
+  .then(r =&gt; r.json())
+  .then(profile =&gt; console.log(profile))
+  .catch(console.error);</code></pre>
+      </section>
+
+      <section id="promise-errors">
+        <h3>Error handling with promises</h3>
+        <pre><code>doAsync().catch(err =&gt; {
+  // centralized error path
+});</code></pre>
+      </section>
+
+      <section id="promise-api">
+        <h3>Promise API</h3>
+        <pre><code>await Promise.all([a(), b()]);
+await Promise.race([slow(), fast()]);
+await Promise.allSettled([p1, p2]);</code></pre>
+      </section>
+
+      <section id="async-await">
+        <h3>Async/await patterns</h3>
+        <pre><code>async function getJson(url){
+  const r = await fetch(url);
+  if(!r.ok) throw new Error(r.status);
+  return r.json();
+}</code></pre>
+      </section>
+
+      <!-- PART 4 -->
+      <section id="part4">
+        <h2>PART 4 · DOM</h2>
+      </section>
+
+      <section id="browser-env">
+        <h3>Browser environment & specs</h3>
+        <p>In the browser, JavaScript can manipulate the DOM, handle events, and make network requests—all defined by
+          Web APIs.</p>
+      </section>
+
+      <section id="dom-tree">
+        <h3>DOM tree</h3>
+        <p>The DOM is a tree of nodes representing the document structure.</p>
+        <pre><code>&lt;ul id="list"&gt;&lt;li&gt;A&lt;/li&gt;&lt;li&gt;B&lt;/li&gt;&lt;/ul&gt;</code></pre>
+      </section>
+
+      <section id="walking">
+        <h3>Walking the DOM</h3>
+        <pre><code>const list = document.getElementById('list');
+list.firstElementChild.textContent; // "A"</code></pre>
+      </section>
+
+      <section id="searching">
+        <h3>Searching: <code>getElement*</code>, <code>querySelector*</code></h3>
+        <pre><code>document.querySelectorAll('li').forEach(li =&gt; console.log(li.textContent));</code></pre>
+      </section>
+
+      <section id="node-props">
+        <h3>Node properties: type, tag, contents</h3>
+        <pre><code>const p = document.createElement('p');
+p.nodeType;   // 1 = ELEMENT_NODE
+p.tagName;    // "P"</code></pre>
+      </section>
+
+      <section id="attrs-props">
+        <h3>Attributes &amp; properties</h3>
+        <pre><code>const img = document.createElement('img');
+img.setAttribute('alt','Logo');
+img.alt; // "Logo"</code></pre>
+      </section>
+
+      <section id="modifying">
+        <h3>Modifying the document</h3>
+        <pre><code>const li = document.createElement('li');
+li.textContent = 'C';
+document.querySelector('#list').append(li);</code></pre>
+      </section>
+
+      <section id="styles-classes">
+        <h3>Styles &amp; classes</h3>
+        <pre><code>const box = document.querySelector('#box');
+box.classList.add('highlight');
+box.style.transform = 'scale(1.05)';</code></pre>
+      </section>
+
+      <section id="events">
+        <h3>Introduction to browser events</h3>
+        <p>Common events: <code>click</code>, <code>mouseover/mouseout</code>, <code>mousedown/mouseup</code>,
+          <code>mousemove</code>, <code>keydown/keyup</code>, <code>DOMContentLoaded</code>, <code>scroll</code>.
+        </p>
+        <pre><code>document.addEventListener('DOMContentLoaded', () =&gt; {
+  document.body.addEventListener('click', e =&gt; console.log('Clicked', e.target));
+});</code></pre>
+      </section>
+
+      <section id="custom-events">
+        <h3>Dispatching custom events</h3>
+        <pre><code>const ev = new CustomEvent('user:login', { detail:{ id: 7 }});
+document.dispatchEvent(ev);
+document.addEventListener('user:login', e =&gt; console.log(e.detail));</code></pre>
+      </section>
+
+      <section id="forms">
+        <h3>Form properties &amp; methods</h3>
+        <pre><code>const form = document.querySelector('form');
+form.addEventListener('submit', e =&gt; {
+  e.preventDefault();
+  const data = new FormData(form);
+  console.log(Object.fromEntries(data.entries()));
+});</code></pre>
+      </section>
+
+      <!-- PART 5 -->
+      <section id="part5">
+        <h2>PART 5 · Network Requests</h2>
+      </section>
+
+      <section id="fetch">
+        <h3>Fetch</h3>
+        <pre><code>fetch('/api/items')
+  .then(r =&gt; r.json())
+  .then(items =&gt; console.log(items))
+  .catch(console.error);</code></pre>
+      </section>
+
+      <section id="formdata">
+        <h3>FormData</h3>
+        <pre><code>const fd = new FormData();
+fd.append('file', new Blob(['hello'], {type:'text/plain'}), 'greet.txt');</code></pre>
+      </section>
+
+      <section id="fetch-api">
+        <h3>Fetch API patterns</h3>
+        <pre><code>const jsonPost = (url, body) =&gt; fetch(url, {
+  method:'POST', headers:{'Content-Type':'application/json'},
+  body: JSON.stringify(body)
+}).then(r =&gt; {
+  if(!r.ok) throw new Error(r.status);
+  return r.json();
+});</code></pre>
+      </section>
+
+      <section id="url">
+        <h3>URL objects</h3>
+        <pre><code>const u = new URL('https://example.com/products');
+u.searchParams.set('q','adapter');
+u.toString(); // "https://example.com/products?q=adapter"</code></pre>
+      </section>
+
+      <section id="xhr">
+        <h3>XMLHttpRequest</h3>
+        <p>Older API; still useful for progress events or legacy code.</p>
+        <pre><code>const xhr = new XMLHttpRequest();
+xhr.open('GET','/api/data');
+xhr.onload = () =&gt; console.log(xhr.responseText);
+xhr.send();</code></pre>
+      </section>
+
+      <!-- PART 6 -->
+      <section id="part6">
+        <h2>PART 6 · Storing Data in the Browser</h2>
+      </section>
+
+      <section id="cookies">
+        <h3>Cookies &amp; <code>document.cookie</code></h3>
+        <pre><code>document.cookie = "theme=dark; Path=/; Max-Age=31536000";</code></pre>
+      </section>
+
+      <section id="storage">
+        <h3>localStorage &amp; sessionStorage</h3>
+        <pre><code>localStorage.setItem('lang','en');
+localStorage.getItem('lang'); // "en"
+sessionStorage.clear();</code></pre>
+      </section>
+
+      <section id="indexeddb">
+        <h3>IndexedDB</h3>
+        <p>Asynchronous, transactional key–value database in the browser.</p>
+        <pre><code>const req = indexedDB.open('mydb',1);
+req.onupgradeneeded = (e) =&gt; e.target.result.createObjectStore('notes');
+req.onsuccess = () =&gt; console.log('DB ready');</code></pre>
+      </section>
+
+      <footer>
+
+      </footer>
+    </main>
+  </div>
+
+  <button class="top" title="Back to top" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑ Top</button>
+
+  <script>
+    // Theme: init from localStorage or system preference
+    (function () {
+      const root = document.documentElement;
+      const saved = localStorage.getItem('theme');
+      const sys = window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
+      const theme = saved || sys;
+      root.setAttribute('data-theme', theme);
+      window.__currentTheme = theme;
+      window.addEventListener('DOMContentLoaded', () => {
+        const btn = document.getElementById('theme-toggle');
+        if (!btn) return;
+        const setLabel = (t) => btn.textContent = t === 'light' ? '🌙 Dark' : '☀️ Light';
+        setLabel(theme);
+        btn.addEventListener('click', () => {
+          const next = (root.getAttribute('data-theme') === 'light') ? 'dark' : 'light';
+          root.setAttribute('data-theme', next);
+          localStorage.setItem('theme', next);
+          setLabel(next);
+        }, { passive: true });
+      });
+    })();
+    /* Active link highlighting & quick filter */
+    const headings = [...document.querySelectorAll('main section[id]')];
+    const links = [...document.querySelectorAll('nav .toc a[href^="#"]')];
+    const linkById = Object.fromEntries(links.map(a => [a.getAttribute('href').slice(1), a]));
+
+    const observer = new IntersectionObserver(entries => {
+      entries.forEach(e => {
+        if (e.isIntersecting) {
+          const id = e.target.id;
+          links.forEach(a => a.classList.remove('active'));
+          linkById[id]?.classList.add('active');
+        }
+      });
+    }, { rootMargin: "-40% 0px -55% 0px", threshold: [0, 1] });
+
+    headings.forEach(h => observer.observe(h));
+
+    document.getElementById('toc-filter').addEventListener('input', e => {
+      const q = e.target.value.toLowerCase().trim();
+      links.forEach(a => {
+        const show = a.textContent.toLowerCase().includes(q);
+        a.parentElement.style.display = show ? '' : 'none';
+      });
+    });
+  </script>
+
+  <script>
+    // in javascript add to every section in this page in the corner right bottom a page number
+    const sections = document.querySelectorAll('main section');
+    sections.forEach((s, i) => {
+      const pagenum = document.createElement('span');
+      pagenum.textContent = i + 1;
+      pagenum.classList.add('pagenum');
+      s.appendChild(pagenum);
+    });
+
+
+  </script>
+
+
+
+  <script>
+    (function () {
+      // Utility: strip <script> tags if present
+      function extractJS(raw) {
+        return raw.replace(/<script[^>]*>/gi, '').replace(/<\/script>/gi, '').trim();
+      }
+
+      // Enhance all <pre><code> blocks
+      document.querySelectorAll('pre > code').forEach((code) => {
+        const pre = code.parentElement;
+
+        // Save original for Reset
+        code.dataset.original = code.textContent;
+
+        // Toolbar
+        const tools = document.createElement('div');
+        tools.className = 'code-tools';
+        const runBtn = document.createElement('button');
+        runBtn.className = 'btn-run';
+        runBtn.textContent = '▶ Run';
+        const resetBtn = document.createElement('button');
+        resetBtn.className = 'btn-reset';
+        resetBtn.textContent = 'Reset';
+
+        tools.appendChild(runBtn);
+        tools.appendChild(resetBtn);
+        pre.appendChild(tools);
+
+
+        function runCode(fromText) {
+          try {
+            const js = extractJS(fromText ?? code.textContent);
+            new Function(js)();
+          } catch (err) {
+            alert('Error: ' + err.message);
+          }
+        }
+
+        runBtn.addEventListener('click', () => runCode());
+
+        resetBtn.addEventListener('click', () => {
+          code.textContent = code.dataset.original || '';
+        });
+
+        // Make editable on double click
+        code.addEventListener('dblclick', () => {
+          if (code.isContentEditable) return;
+          code.contentEditable = 'true';
+          code.classList.add('editing');
+          // Place caret at end
+          const sel = window.getSelection();
+          const range = document.createRange();
+          range.selectNodeContents(code);
+          range.collapse(false);
+          sel.removeAllRanges();
+          sel.addRange(range);
+          code.focus();
+        });
+
+        // Exit edit mode on blur
+        code.addEventListener('blur', () => {
+          code.contentEditable = 'false';
+          code.classList.remove('editing');
+        });
+
+        // Keyboard shortcuts while editing
+        code.addEventListener('keydown', (e) => {
+          if (!code.isContentEditable) return;
+
+          // Esc = cancel changes (revert to last saved original? No—revert to pre-edit state)
+          if (e.key === 'Escape') {
+            document.execCommand && document.execCommand('undo'); // best-effort revert last edit
+            code.blur();
+          }
+
+          // Ctrl/Cmd + Enter = run
+          if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+            e.preventDefault();
+            code.blur();
+            runCode(code.textContent);
+          }
+
+          // Keep Tab inserting spaces instead of focusing away
+          if (e.key === 'Tab') {
+            e.preventDefault();
+            const spaces = '  ';
+            // Insert at caret
+            if (document.execCommand) document.execCommand('insertText', false, spaces);
+          }
+        });
+
+        // Paste as plain text (avoid bringing HTML)
+        code.addEventListener('paste', (e) => {
+          if (!code.isContentEditable) return;
+          e.preventDefault();
+          const text = (e.clipboardData || window.clipboardData).getData('text');
+          if (document.execCommand) document.execCommand('insertText', false, text);
+        });
+      });
+    })();
+  </script>
+</body>
+
+</html>

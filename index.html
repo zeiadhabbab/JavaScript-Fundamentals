@@ -426,7 +426,7 @@
               <li><a href="#loops">Loops: while / for</a></li>
               <li><a href="#switch">switch</a></li>
               <li><a href="#functions">Functions (declaration, params)</a></li>
-              <li><a href="#func-expr">Function expressions & callbacks</a></li>
+              <li><a href="#func-expr">Function expressions</a></li>
               <li><a href="#arrows">Arrow functions</a></li>
             </ol>
           </details>
@@ -704,22 +704,49 @@ const label = age &gt;= 18 ? 'adult' : 'minor';</code></pre>
         <h3>Nullish coalescing: <code>??</code></h3>
         <p>Return the right side only when the left is <em>null</em> or <em>undefined</em> (unlike <code>||</code>,
           which treats many values as “falsy”).</p>
-        <pre><code>const nick = null;
-nick ?? 'anonymous'    // "anonymous"
-0 ?? 5                 // 0 (kept)</code></pre>
+
+
+        <p>
+          Historically, the OR || operator was there first. It’s been there since the beginning of JavaScript, so
+          developers were using it for such purposes for a long time.
+
+          On the other hand, the nullish coalescing operator ?? was added to JavaScript only recently, and the reason
+          for that was that people weren’t quite happy with ||.
+
+          The important difference between them is that:
+        <ul>
+          <li><code>||</code> returns the first truthy value.</li>
+          <li><code>??</code> returns the first defined value (ignores only <code>null</code> and
+            <code>undefined</code>).
+          </li>
+        </ul>
+
+        <pre><code>let height = 0;
+alert(height || 100); // 100
+alert(height ?? 100); // 0</code></pre>
+
+        <ul>
+          <li>The nullish coalescing operator <code>??</code> provides a short way to choose the first “defined” value
+            from a list.</li>
+          <li>It’s used to assign default values to variables.</li>
+          <li>The operator <code>??</code> has a very low precedence, only a bit higher than <code>?</code> and
+            <code>=</code>, so consider adding parentheses when using it in an expression.
+          </li>
+          <li>It’s forbidden to use it with <code>||</code> or <code>&amp;&amp;</code> without explicit parentheses.
+          </li>
+        </ul>
+
+        </p>
         <p>
           <a href="https://www.youtube.com/watch?v=TOBlbEe224Q" target="_blank">Nullish Coalescing (??) in 2 Minutes
-</a>
+          </a>
         </p>
       </section>
 
       <section id="loops">
         <h3>Loops: <code>while</code>, <code>for</code></h3>
-        <pre><code>for (let i=1;i&lt;=5;i++) console.log(i); // 1..5
-let n=5; while(n) { n--; }</code></pre>
-
-        <pre>
-  <code>while (condition) {
+        <p>Loops are a way to repeat the same code multiple times.</p>
+        <pre><code>while (condition) {
   // code
   // so-called "loop body"
 }</code>
@@ -728,41 +755,223 @@ let n=5; while(n) { n--; }</code></pre>
   // loop body
 } while (condition);</code>
 </pre>
+
+        <p>Examples</p>
+        <pre><code>let i = 0;
+while (i < 3) { // shows 0, then 1, then 2
+  alert( i );
+  i++;
+}</code></pre>
+
+        <pre><code>let i = 0;
+do {
+  alert( i );
+  i++;
+} while (i < 3);</code></pre>
+
+
+        <pre><code>for (let i = 0; i < 3; i++) { // shows 0, then 1, then 2
+  alert(i);
+}</code></pre>
+
+        <h4>Breaking the loop</h4>
+        <p>Normally, a loop exits when its condition becomes falsy.
+
+          But we can force the exit at any time using the special break directive.</p>
+        <pre><code>let sum = 0;
+
+while (true) {
+  let value = +prompt("Enter a number", '');
+  if (!value) break; // (*)
+  sum += value;
+
+}
+alert( 'Sum: ' + sum );</code></pre>
+        <h4>Continue to the next iteration</h4>
+        <p>The continue directive is a “lighter version” of break. It doesn’t stop the whole loop. Instead, it stops the
+          current iteration and forces the loop to start a new one (if the condition allows).</p>
+        <pre><code>for (let i = 0; i < 10; i++) {
+
+  // if true, skip the remaining part of the body
+  if (i % 2 == 0) continue;
+
+  alert(i); // 1, then 3, 5, 7, 9
+}</code></pre>
       </section>
 
       <section id="switch">
         <h3>The <code>switch</code> statement</h3>
+        <p>A switch statement can replace multiple if checks.
+
+          It gives a more descriptive way to compare a value with multiple variants.</p>
         <pre><code>const role = 'admin';
 switch (role) {
   case 'user':  /* ... */ break;
   case 'admin': /* ... */ break;
   default:      /* ... */
 }</code></pre>
+        <p>Example</p>
+        <pre><code>let arg = prompt("Enter a value?");
+switch (arg) {
+  case '0':
+   alert( 'Zero' );
+  case '1':
+    alert( 'One' );
+    break;
+  case '2':
+    alert( 'Two' );
+    break;
+  case '3':
+    alert( 'Three' );
+    break;
+  default:
+    alert( 'An unknown value' );
+}</code></pre>
       </section>
 
       <!-- to do -->
       <section id="functions">
         <h3>Functions (declaration, local/outer vars, params, defaults)</h3>
-        <pre><code>function greet(name = 'friend'){ return `Hi, ${name}`; }
-greet();        // "Hi, friend"
-greet('Ava');   // "Hi, Ava"</code></pre>
+        <p>Functions are the main “building blocks” of the program. They allow the code to be called many times without
+          repetition.
+
+          We’ve already seen examples of built-in functions, like alert(message), prompt(message, default) and
+          confirm(question). But we can create functions of our own as well.</p>
+
+        <h4>Function Declaration</h4>
+
+        <p>To create a function we can use a function declaration.</p>
+        <p>It looks like this:</p>
+
+        <pre><code>function showMessage() {
+  alert( 'Hello everyone!' );
+}
+showMessage()
+</code></pre>
+
+        <p>The function keyword goes first, then goes the name of the function, then a list of parameters between the
+          parentheses (comma-separated, empty in the example above, we’ll see examples later) and finally the code of
+          the function, also named “the function body”, between curly braces.</p>
+        <h4>Parameters</h4>
+        <pre><code>function showMessage(name) {
+  let message = "Hello " + name + ", I'm JavaScript!"; // local variable
+
+  alert( message );
+}
+
+showMessage('Saeed'); // Hello, I'm JavaScript!
+</code>
+          </pre>
+
+        <h4>Default values</h4>
+        <p>We can specify the so-called “default” (to use if omitted) value for a parameter in the function declaration,
+          using =:
+        </p>
+        <pre><code>function showMessage(name = "stranger") {
+  let message = "Hello " + name + ", I'm JavaScript!"; // local variable
+
+  alert( message );
+}
+showMessage("Layla");
+showMessage(); 
+</code></pre>
+
+        <h4>Returning a value</h4>
+        <p>A function can return a value back into the calling code as the result.
+
+          The simplest example would be a function that sums two values:</p>
+        <pre><code>function sum(a, b) {
+  return a + b;
+}
+
+let result = sum(1, 2);
+alert( result ); // 3</code></pre>
       </section>
 
       <section id="func-expr">
-        <h3>Function expressions & callbacks</h3>
-        <pre><code>const twice = x =&gt; x*2;
-[1,2,3].map(twice); // [2,4,6]</code></pre>
+        <h3>Function expressions</h3>
+        <p>In JavaScript, a function is not a “magical language structure”, but a special kind of value.
 
+          The syntax that we used before is called a Function Declaration:</p>
+        <pre><code>function sayHi() {
+  alert( "Hello" );
+}
+sayHi(); // Hello </code></pre>
+
+        <p>There is another syntax for creating a function that is called a Function Expression.
+
+          It allows us to create a new function in the middle of any expression.</p>
+
+        For example:
         <pre><code>let sayHi = function() {
   alert( "Hello" );
-};</code></pre>
+};
+sayHi(); // Hello
+
+</code></pre>
+
+        Here we can see a variable sayHi getting a value, the new function, created as function() { alert("Hello"); }.
+        <h4>Callback function</h4>
+
+        <pre><code>function ask(question, yes, no) {
+  if (confirm(question)) yes()
+  else no();
+}
+
+function showOk() {
+  alert( "You agreed." );
+}
+
+function showCancel() {
+  alert( "You canceled the execution." );
+}
+
+// usage: functions showOk, showCancel are passed as arguments to ask
+ask("Do you agree?", showOk, showCancel);</code></pre>
       </section>
 
       <section id="arrows">
-        <h3>Arrow functions, basics</h3>
-        <p>Concise syntax; lexical <code>this</code>.</p>
-        <pre><code>const add = (a,b) =&gt; a+b;
-const ids  = items =&gt; items.map(it =&gt; it.id);</code></pre>
+        <h3>Arrow functions</h3>
+        <p>There’s another very simple and concise syntax for creating functions, that’s often better than Function
+          Expressions.
+          It’s called “arrow functions”, because it looks like this:
+        <pre><code>let func = (arg1, arg2, ..., argN) => expression;</code></pre>
+        <p>This creates a function func that accepts arguments arg1..argN, then evaluates the expression on the right
+          side with their use and returns its result.</p>
+        <pre><code>let func = function(arg1, arg2, ..., argN) {
+  return expression;
+};</code></pre>
+        <pre><code>function func(arg1, arg2, ..., argN) {
+  return expression;
+};</code></pre>
+        <p>Example:</p>
+        <pre><code>let sum = (a, b) => a + b;
+
+/* This arrow function is a shorter form of:
+let sum = function(a, b) {
+  return a + b;
+};
+*/
+
+alert( sum(1, 2) ); // 3</code></pre>
+        <pre><code>let age = prompt("What is your age?", 18);
+
+let welcome = (age < 18) ?
+  () => alert('Hello!') :
+  () => alert("Greetings!");
+
+welcome();</code></pre>
+        </p>
+        <h4>Multiline arrow functions</h4>
+        <p>Sometimes we need a more complex function, with multiple expressions and statements. In that case, we can
+          enclose them in curly braces. The major difference is that curly braces require a return within them to return
+          a value (just like a regular function does).</p>
+        <pre><code>let sum = (a, b) => {  // the curly brace opens a multiline function
+  let result = a + b;
+  return result; // if we use curly braces, then we need an explicit "return"
+};
+
+alert( sum(1, 2) ); // 3</code></pre>
       </section>
 
       <!-- PART 2 -->

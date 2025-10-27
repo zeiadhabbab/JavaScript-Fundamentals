@@ -450,10 +450,12 @@
             <ol>
               <li><a href="#array-methods">Array methods</a></li>
               <li><a href="#map-set">Map & Set</a></li>
+              <li><a href="#objects">Objects</a></li>
               <li><a href="#object-entries">Object.keys / values / entries</a></li>
               <li><a href="#date-time">Date & time</a></li>
               <li><a href="#json">JSON & toJSON</a></li>
               <li><a href="#timers">setTimeout / setInterval</a></li>
+              <li><a href="#function-binding">Function binding</a></li>
               <li><a href="#try-catch">Error handling</a></li>
               <li><a href="#promises">Promises & async/await</a></li>
               <li><a href="#promise-chaining">Promise chaining</a></li>
@@ -679,9 +681,9 @@ let x = 2; x *= 3 + 1; // 8 </code></pre>
         <pre>
           <code>
             if(age >= 18) {
-                console.log('adult');
+                alert('adult');
             } else {
-                console.log('minor');
+                alert('minor');
             }</code>
         </pre>
 
@@ -1146,82 +1148,696 @@ alert(unique.length); // 6
 </code></pre>
       </section>
 
+
+      <section id="objects">
+        <h3>Objects</h3>
+        <p>
+          Objects store keyed collections of data and more complex entities. Unlike primitives (single values),
+          objects are mutable containers of <em>properties</em> (key–value pairs). Keys are strings or symbols;
+          values can be anything.
+        </p>
+
+        <h4>Create objects</h4>
+        <pre><code>let user1 = new Object();   // constructor syntax
+let user2 = {};             // literal syntax (common)</code></pre>
+
+        <h4>Literals &amp; properties</h4>
+        <pre><code>let user = {
+  name: "John",
+  age: 30
+};
+// read
+alert(user.name); // "John"
+alert(user.age);  // 30
+// add
+user.isAdmin = true;
+// delete
+delete user.age;</code></pre>
+
+        <h4>Multiword keys &amp; bracket notation</h4>
+        <p>Dot notation needs valid identifiers. Use brackets for any string key or when key comes from a variable.</p>
+        <pre><code>let user = {};
+user["likes birds"] = true;
+alert(user["likes birds"]); // true
+
+let key = "likes birds";
+alert(user[key]); // true
+
+user.name = "John";
+// Dot notation cannot use a variable name as a key:
+let k = "name";
+alert(user.k); // undefined (looks for literal 'k')
+alert(user[k]);</code></pre>
+        <h4>Computed properties</h4>
+        <p>Build keys dynamically inside object literals.</p>
+        <pre><code>let fruit = "apple";
+let bag = {
+  [fruit]: 5,              // key becomes "apple"
+  [fruit + "Computers"]: 2 // key becomes "appleComputers"
+};
+alert(bag.apple);           // 5
+alert(bag.appleComputers);  // 2</code></pre>
+
+        <h4>Property value shorthand</h4>
+        <pre><code>function makeUser(name, age){
+  return { name, age }; // same as { name: name, age: age }
+}
+const u = makeUser("John", 30);
+alert(u.name); // "John"</code></pre>
+
+        <h4>Property name rules</h4>
+        <p>Object property names can be (almost) any string—even reserved words or numeric-looking strings.</p>
+        <pre><code>let obj = { for: 1, let: 2, return: 3, 0: "zero" };
+alert(obj.for + obj.let + obj.return); // 6
+alert(obj[0]); // "zero" "zero"
+alert(obj["0"]); // "zero" "zero"
+</code></pre>
+
+        <div class="tip">Note: <code>__proto__</code> is special; assigning non-objects to it won’t behave like normal
+          props.</div>
+
+        <h4>Check property existence</h4>
+        <p>Reading a missing property returns <code>undefined</code>. Use <code>"key" in obj</code> when
+          <code>undefined</code> could be a valid value.
+        </p>
+        <pre><code>let user = {};
+alert(user.missing === undefined); // true
+
+let obj2 = { test: undefined };
+alert("test" in obj2); // true (property exists)</code></pre>
+
+        <h4>Iterate properties: <code>for...in</code></h4>
+        <pre><code>let user = { name: "John", age: 30, isAdmin: true };
+for (let key in user) {
+  alert(key + ' ' + user[key]);
+}</code></pre>
+
+        <h4>Property order</h4>
+        <p>Integer-like keys iterate in ascending numeric order; other keys iterate in creation order.</p>
+        <pre><code>let codes = { "49": "Germany", "41": "Switzerland", "1": "USA" };
+for (let code in codes) alert(code); // 1, 41, 49
+
+let user3 = { name: "John", surname: "Smith" };
+user3.age = 25;
+for (let k in user3) alert(k); // name, surname, age</code></pre>
+
+        <h4>Summary</h4>
+        <ul>
+          <li>Objects = key–value stores; keys are strings/symbols, values are any type.</li>
+          <li>Access via dot (<code>obj.key</code>) or brackets (<code>obj["key"]</code>); brackets allow variables
+            &amp; any string.</li>
+          <li>Manage props: <code>obj.key = v</code>, <code>delete obj.key</code>, test with <code>"key" in obj</code>.
+          </li>
+          <li>Iterate with <code>for...in</code>. Integer-like keys are ordered numerically; others by insertion order.
+          </li>
+        </ul>
+      </section>
+
+
+
+
       <section id="object-entries">
         <h3>Object.keys / values / entries</h3>
-        <pre><code>const u = {id:7, name:'Sam'};
-Object.entries(u).forEach(([k,v]) =&gt; console.log(k,v));</code></pre>
+        <p>These methods are used to retrieve different aspects of an object's properties.</p>
+        <pre><code>const person = {
+  name: 'Alice',
+  age: 30,
+  city: 'New York'
+};
+
+// Object.keys returns an array of keys
+const keys = Object.keys(person);
+alert(keys); // ['name', 'age', 'city']
+
+// Object.values returns an array of values
+const values = Object.values(person);
+alert(values); // ['Alice', 30, 'New York']
+
+// Object.entries returns an array of key-value pairs
+const entries = Object.entries(person);
+alert(entries); // [['name', 'Alice'], ['age', 30], ['city', 'New York']]</code></pre>
+
       </section>
 
       <section id="date-time">
-        <h3>Date &amp; time</h3>
-        <pre><code>const d = new Date();
-d.toISOString();              // "2025-10-20T...Z"
-d.getFullYear();              // e.g., 2025</code></pre>
+        <h3>Date &amp; Time (Summary)</h3>
+        <p>
+          JavaScript represents date/time with the built-in <code>Date</code> object. A Date always has
+          both date and time. Months are 0–11 (Jan=0). <code>getDay()</code> returns 0–6 (Sun=0).
+          Dates “auto-correct” when you set out-of-range parts (useful for adding days/months).
+        </p>
+
+        <h4>Create dates</h4>
+        <pre><code>// Current date/time
+let now = new Date();
+alert(now);
+
+// From timestamp (ms since Jan 1, 1970 UTC)
+let jan01_1970 = new Date(0);
+alert(jan01_1970);
+
+let jan02_1970 = new Date(24 * 3600 * 1000);
+alert(jan02_1970);
+
+// Before 1970: negative timestamps
+let dec31_1969 = new Date(-24 * 3600 * 1000);
+alert(dec31_1969);
+
+// From ISO-like string (parsed similar to Date.parse)
+let d1 = new Date("2017-01-26");
+alert(d1);
+
+// From parts (year, month(0-11), date, hours, minutes, seconds, ms)
+let d2 = new Date(2011, 0, 1, 2, 3, 4, 567);
+alert(d2);</code></pre>
+
+        <h4>Read components (local time)</h4>
+        <pre><code>let d = new Date();
+alert(d.getFullYear());   // e.g., 2025
+alert(d.getMonth());      // 0..11
+alert(d.getDate());       // 1..31
+alert(d.getDay());        // 0..6 (Sun..Sat)
+alert(d.getHours());      // 0..23
+alert(d.getMinutes());    // 0..59
+alert(d.getSeconds());    // 0..59
+alert(d.getMilliseconds());// 0..999
+
+// UTC variants: getUTCFullYear(), getUTCMonth(), getUTCHours()...
+alert(d.getUTCHours());   // hour in UTC</code></pre>
+
+        <h4>Set components (auto-correct applies)</h4>
+        <pre><code>let today = new Date();
+
+// Change just the hour
+today.setHours(0);
+alert(today);
+
+// Set exact time to 00:00:00.000
+today.setHours(0, 0, 0, 0);
+alert(today);</code></pre>
+
+        <h4>Autocorrection (handy for adding time)</h4>
+        <pre><code>let date = new Date(2013, 0, 32); // Jan 32, 2013 ?!
+alert(date); // auto-corrects to Feb 1, 2013
+
+let leap = new Date(2016, 1, 28);       // Feb 28, 2016
+leap.setDate(leap.getDate() + 2);       // add 2 days
+alert(leap); // Mar 1, 2016</code></pre>
+
+        <h4>Timestamps &amp; differences</h4>
+        <pre><code>let start = new Date();
+// do some work
+for (let i = 0; i &lt; 100000; i++) { let x = i * i * i; }
+let end = new Date();
+
+alert("The loop took " + (end - start) + " ms"); // subtracting dates = ms diff
+alert(+end); // number conversion → timestamp (same as end.getTime())</code></pre>
+
+        <h4>Fast now (no Date object)</h4>
+        <pre><code>let t1 = Date.now(); // ms since Jan 1, 1970
+for (let i = 0; i &lt; 100000; i++) { let x = i * i * i; }
+let t2 = Date.now();
+alert("The loop took " + (t2 - t1) + " ms");</code></pre>
+
+        <h4>Parsing strings</h4>
+        <pre><code>// ISO-like format: YYYY-MM-DDTHH:mm:ss.sssZ (Z or ±hh:mm)
+let ms = Date.parse("2012-01-26T13:51:50.417-07:00");
+alert(ms);                        // timestamp (ms)
+let parsed = new Date(ms);        // make Date from it
+alert(parsed);</code></pre>
+
+        <h4>Key points</h4>
+        <ul>
+          <li><code>Date</code> always includes both date and time.</li>
+          <li>Months are zero-based; <code>getDay()</code>: Sun=0..Sat=6.</li>
+          <li>Setting out-of-range parts auto-adjusts the date.</li>
+          <li>Subtract Dates (or use <code>Date.now()</code>) to measure durations.</li>
+        </ul>
       </section>
+
 
       <section id="json">
-        <h3>JSON methods &amp; <code>toJSON</code></h3>
-        <pre><code>const obj = {a:1, b:2};
-const s = JSON.stringify(obj); // '{"a":1,"b":2}'
-JSON.parse(s).b;               // 2</code></pre>
+        <h3>JSON methods &amp; <code>toJSON</code> (Summary)</h3>
+        <p>
+          <strong>JSON</strong> is a data format for exchanging structured data. In JS, use
+          <code>JSON.stringify</code> to serialize values → string, and <code>JSON.parse</code> to read
+          them back. JSON supports objects, arrays, strings, numbers, booleans, and <code>null</code>.
+          (Functions, <code>undefined</code>, and symbol properties are skipped.)
+        </p>
+
+        <h4>Stringify basics</h4>
+        <pre><code>let student = {
+  name: "John",
+  age: 30,
+  isAdmin: false,
+  courses: ["html","css","js"],
+  spouse: null
+};
+
+let json = JSON.stringify(student);   // → string
+alert(typeof json);                   // "string"
+alert(json);
+/* Example output:
+{"name":"John","age":30,"isAdmin":false,"courses":["html","css","js"],"spouse":null}
+*/</code></pre>
+
+        <h4>Primitives also stringify</h4>
+        <pre><code>alert(JSON.stringify(1));           // 1
+alert(JSON.stringify("test"));     // "test"
+alert(JSON.stringify(true));       // true
+alert(JSON.stringify([1,2,3]));    // [1,2,3]</code></pre>
+
+        <h4>Skipped in JSON</h4>
+        <pre><code>let user = {
+  sayHi(){ alert("Hello"); },   // function → skipped
+  [Symbol("id")]: 123,          // symbol → skipped
+  something: undefined          // undefined → skipped
+};
+alert(JSON.stringify(user));     // "{}"</code></pre>
+
+        <h4>Nested objects (ok) &amp; circular refs (error)</h4>
+        <pre><code>let room = { number: 23 };
+let meetup = { title: "Conference", place: room };
+room.occupiedBy = meetup; // circular link
+try {
+  JSON.stringify(meetup);
+} catch (e) {
+  alert("Error: " + e.message);  // Converting circular structure to JSON
+}</code></pre>
+
+        <h4>Filtering/transforming: <code>replacer</code></h4>
+        <p>
+          Use an array of allowed keys, or a function <code>(key, value) =&gt; newValue</code>.
+        </p>
+        <pre><code>let room2 = { number: 23 };
+let meetup2 = {
+  title: "Conference",
+  participants: [{name:"John"},{name:"Alice"}],
+  place: room2
+};
+room2.occupiedBy = meetup2;
+
+// Keep only selected keys everywhere:
+alert(JSON.stringify(meetup2, ["title","participants","place","name","number"]));
+/*
+{"title":"Conference","participants":[{"name":"John"},{"name":"Alice"}],"place":{"number":23}}
+*/
+
+// Or use a replacer function to drop circular ref:
+alert(JSON.stringify(meetup2, function replacer(key, value){
+  if (key === "occupiedBy") return undefined;
+  return value;
+}));</code></pre>
+
+        <h4>Pretty printing: <code>space</code></h4>
+        <pre><code>let userPretty = { name:"John", age:25, roles:{ isAdmin:false, isEditor:true } };
+let pretty = JSON.stringify(userPretty, null, 2); // 2-space indent
+alert(pretty);
+/* 
+{
+  "name": "John",
+  "age": 25,
+  "roles": {
+    "isAdmin": false,
+    "isEditor": true
+  }
+}
+*/</code></pre>
+
+        <h4>Custom <code>toJSON</code></h4>
+        <pre><code>let room3 = {
+  number: 23,
+  toJSON(){ return this.number; } // define your own JSON form
+};
+let meetup3 = { title: "Conference", room: room3 };
+
+alert(JSON.stringify(room3));   // 23
+alert(JSON.stringify(meetup3)); // {"title":"Conference","room":23}</code></pre>
+
+        <h4>Parsing strings: <code>JSON.parse</code></h4>
+        <pre><code>let numbers = "[0,1,2,3]";
+let arr = JSON.parse(numbers);
+alert(arr[1]); // 1
+
+let userData = '{"name":"John","age":35,"isAdmin":false,"friends":[0,1,2,3]}';
+let userObj = JSON.parse(userData);
+alert(userObj.friends[1]); // 1</code></pre>
+
+         
+
+        <h4>Key points</h4>
+        <ul>
+          <li><code>JSON.stringify(value, replacer?, space?)</code> → string.</li>
+          <li><code>JSON.parse(str, reviver?)</code> → value; use <em>reviver</em> to restore types like
+            <code>Date</code>.
+          </li>
+          <li>If an object has <code>toJSON</code>, it’s used automatically during stringify.</li>
+        </ul>
       </section>
+
 
       <section id="timers">
-        <h3>Scheduling: <code>setTimeout</code> &amp; <code>setInterval</code></h3>
-        <pre><code>const id = setInterval(() =&gt; console.log('tick'), 1000);
-setTimeout(() =&gt; clearInterval(id), 3100);</code></pre>
-      </section>
+  <h3>Scheduling (Summary): <code>setTimeout</code> &amp; <code>setInterval</code></h3>
+  <p>
+    Schedule code to run later. <code>setTimeout(fn, ms)</code> runs once after <em>ms</em>. 
+    <code>setInterval(fn, ms)</code> repeats every <em>ms</em> until canceled. 
+    Delays are approximate (CPU load, background tabs, battery saver, etc.).
+  </p>
+
+  <h4>Run once: <code>setTimeout</code></h4>
+  <pre><code>
+let tId = setTimeout(() => alert("John"), 1000); // 1s later → "Hi, John!"
+ </code></pre>
+
+  <h4>Repeat: <code>setInterval</code> (and stop)</h4>
+  <pre><code>let ticks = 0;
+let iId = setInterval(() =&gt; {
+  alert("tick " + (++ticks));
+  if (ticks === 3) { clearInterval(iId); alert("stop"); }
+}, 1500); // every 1.5s</code></pre>
+
+ 
+
+  <h4>“ASAP” after current script</h4>
+  <pre><code>setTimeout(() =&gt; alert("World")); // queued
+alert("Hello");                    // shows first</code></pre>
+
+  <div class="tip small">
+    Notes: After ~5 nested timers, browsers enforce a ≥4ms minimum. Don’t pass strings (e.g. <code>"alert('x')"</code>); pass functions.
+  </div>
+</section>
+
+<section id="function-binding">
+  <h3>Function Binding (Short Summary)</h3>
+  <p>
+    When we pass object methods (e.g. to <code>setTimeout</code>), 
+    <code>this</code> can be lost — it no longer refers to the original object.  
+    <code>bind()</code> fixes that by locking the function’s <code>this</code> value.
+  </p>
+
+  <h4>Lost <code>this</code></h4>
+  <pre><code>let user = {
+  firstName: "John",
+  sayHi() { alert("Hi, " + this.firstName); }
+};
+
+setTimeout(user.sayHi, 1000); // ❌ "Hi, undefined"</code></pre>
+
+  <h4>Fix 1: wrapper function</h4>
+  <pre><code>let user = {
+  firstName: "John",
+  sayHi() { alert("Hi, " + this.firstName); }
+};
+
+setTimeout(() => user.sayHi(), 1000); // ✅ "Hi, John"</code></pre>
+
+  <h4>Fix 2: <code>bind()</code></h4>
+  <pre><code>let user = {
+  firstName: "John"
+};
+
+function func() {
+  alert(this.firstName);
+}
+
+let funcUser = func.bind(user);
+funcUser(); // John</code></pre>
+
+ 
+
+  <ul>
+    <li><code>bind(thisArg)</code> fixes the value of <code>this</code>.</li>
+     <li>Use <code>bind</code> when passing methods as callbacks.</li>
+  </ul>
+
+   
+</section>
 
       <section id="try-catch">
-        <h3>Error handling, <code>try...catch</code></h3>
-        <pre><code>try {
-  JSON.parse('{bad json}');
+  <h3>Error handling (Summary): <code>try...catch</code></h3>
+  <p>
+    Use <code>try...catch</code> to prevent crashes on runtime errors and handle them gracefully.
+    Optional <code>finally</code> runs whether an error happened or not.
+  </p>
+
+  <h4>Basic pattern</h4>
+  <pre><code>try {
+  alert("Start");
+  lalala;                 // runtime error
+  alert("Never runs");
 } catch (err) {
-  console.error('Oops:', err.message);
+  alert(err.name + ": " + err.message); // e.g., "ReferenceError: lalala is not defined"
+} finally {
+  alert("Cleanup always runs");
 }</code></pre>
-      </section>
+
+  <h4>Throw your own errors</h4>
+  <pre><code>let json = '{ "age": 30 }';
+try {
+  let user = JSON.parse(json);
+  if (!user.name) throw new SyntaxError("Incomplete data: no name");
+  alert("User: " + user.name);
+} catch (err) {
+  alert("JSON Error: " + err.message);
+}</code></pre>
+
+  
+
+</section>
+
 
       <section id="promises">
-        <h3>Promises &amp; async/await</h3>
-        <pre><code>const delay = ms =&gt; new Promise(res =&gt; setTimeout(res, ms));
-(async () =&gt; {
-  await delay(300);
-  console.log('done');
-})();</code></pre>
-      </section>
+  <h3>Promises (Short Summary)</h3>
+  <p>
+    A <code>Promise</code> links slow “producing” code to “consuming” code.
+    It starts <em>pending</em> and settles once: <em>fulfilled</em> via <code>resolve</code> or <em>rejected</em> via <code>reject</code>.
+    Use <code>.then</code> for success, <code>.catch</code> for errors, and <code>.finally</code> for cleanup.
+  </p>
+
+  <h4>Create</h4>
+  <pre><code>let p = new Promise((resolve, reject) => {
+  // async work...
+  setTimeout(() => resolve("done"), 500); // or: reject(new Error("oops"))
+});</code></pre>
+
+  <h4>Consume</h4>
+  <pre><code>p.then(result => alert(result))         // "done"
+ .catch(err => alert(err))              // "Error: oops"
+ .finally(() => alert("finished"));     // always runs</code></pre>
+
+  <h4>One result only</h4>
+  <pre><code>new Promise(r => { r("A"); r("B"); })  // "B" is ignored</code></pre>
+
+  <h4>Handlers can be added anytime</h4>
+  <pre><code>let ready = Promise.resolve("OK");
+ready.then(v => alert(v)); // alerts immediately</code></pre>
+
+  <h4>Mini example: load script</h4>
+  <pre><code>function loadScript(src) {
+  return new Promise((resolve, reject) => {
+    const s = document.createElement("script");
+    s.src = src;
+    s.onload = () => resolve(s);
+    s.onerror = () => reject(new Error("Load error: " + src));
+    document.head.append(s);
+  });
+}
+
+loadScript("https://example.com/app.js")
+  .then(s => alert(s.src + " loaded"))
+  .catch(e => alert(e.message))
+  .finally(() => alert("done"));
+
+
+loadScript("https://portal.almasar101.com/wp-includes/js/jquery/ui/core.min.js?ver=1.13.3")
+  .then(s => alert(s.src + " loaded"))
+  .catch(e => alert(e.message))
+  .finally(() => alert("done"));
+
+
+
+</code></pre>
+
+<a href="https://www.youtube.com/watch?v=y2X196MIuRo" target="_blank">Watch Promise Video Explanation Arabic</a>
+<br>
+<a href="https://www.youtube.com/watch?v=li7FzDHYZpc" target="_blank">Watch Promise Video Explanation English</a>
+</section>
+
 
       <section id="promise-chaining">
         <h3>Promise chaining</h3>
-        <pre><code>fetch('/api/user')
-  .then(r =&gt; r.json())
-  .then(user =&gt; fetch(`/api/profile/${user.id}`))
-  .then(r =&gt; r.json())
-  .then(profile =&gt; console.log(profile))
-  .catch(console.error);</code></pre>
-      </section>
+        <p>Chaining promises allows you to perform sequential asynchronous operations. Each <code>.then</code> handler receives the result of the previous one, and you can return a new value or a promise to pass it to the next handler.</p>
+        <pre><code>new Promise(function(resolve, reject) {
 
-      <section id="promise-errors">
-        <h3>Error handling with promises</h3>
-        <pre><code>doAsync().catch(err =&gt; {
-  // centralized error path
+  setTimeout(() => resolve(1), 1000); // (*)
+
+}).then(function(result) { // (**)
+
+  alert(result); // 1
+  return result * 2;
+
+}).then(function(result) { // (***)
+
+  alert(result); // 2
+  return result * 2;
+
+}).then(function(result) {
+
+  alert(result); // 4
+  return result * 2;
+
 });</code></pre>
       </section>
 
+      <section id="promise-error">
+  <h3>Error Handling with Promises (Short Summary)</h3>
+  <p>
+    <code>.catch</code> handles any rejection or error in a promise chain — even those thrown in <code>.then</code> handlers.  
+    You can place one <code>.catch</code> at the end to handle all errors above.
+  </p>
+
+  <h4>Basic example</h4>
+  <pre><code>fetch('https://no-such-server.example')
+  .then(r => r.json())
+  .catch(err => alert("Error: " + err.message));</code></pre>
+
+  <h4>Implicit try...catch</h4>
+  <pre><code>new Promise(() => { throw new Error("Whoops!"); })
+  .catch(err => alert(err)); // works same as reject()</code></pre>
+
+  <h4>Rethrowing</h4>
+  <pre><code>new Promise(() => { throw new Error("Whoops!"); })
+  .catch(e => {
+    if (e instanceof URIError) alert("Handled");
+    else throw e; // pass to next .catch
+  })
+  .catch(e => alert("Final catch: " + e));</code></pre>
+
+  <h4>Unhandled rejections</h4>
+  <pre><code>window.addEventListener("unhandledrejection", e => {
+  alert("Unhandled: " + e.reason);
+});
+
+new Promise(() => { throw new Error("Whoops!"); });</code></pre>
+
+  <ul>
+    <li><code>.catch</code> catches rejections or thrown errors.</li>
+    <li>Use <code>throw</code> inside <code>.catch</code> to rethrow unhandled ones.</li>
+    <li>Browsers trigger <code>unhandledrejection</code> if a rejected promise has no <code>.catch</code>.</li>
+  </ul>
+</section>
+
+
       <section id="promise-api">
-        <h3>Promise API</h3>
-        <pre><code>await Promise.all([a(), b()]);
-await Promise.race([slow(), fast()]);
-await Promise.allSettled([p1, p2]);</code></pre>
-      </section>
+  <h3>Promise API (Short Summary)</h3>
+  <p>
+    The <code>Promise</code> class has 6 static methods to combine or create promises.  
+    They help run tasks in parallel, handle multiple results, or settle early.
+  </p>
+
+  <h4>1️⃣ Promise.all</h4>
+  <p>Waits for <strong>all</strong> promises to resolve → returns array of results.  
+     Rejects immediately if any fail.</p>
+  <pre><code>Promise.all([
+  fetch("https://api.github.com/users/iliakan"), fetch("https://api.github.com/users/zeiadhabbab")
+]).then(all => alert("All done"))
+  .catch(err => alert("Error: " + err));</code></pre>
+
+  <h4>2️⃣ Promise.allSettled</h4>
+  <p>Waits for <strong>all</strong> to finish (fulfilled or rejected). Always resolves with an array of status objects.</p>
+  <pre><code>Promise.allSettled([
+  fetch("https://api.github.com/users/zeiadhabbab"), fetch("bad.json")
+]).then(r => alert(JSON.stringify(r)));</code></pre>
+
+  <h4>3️⃣ Promise.race</h4>
+  <p>Resolves/rejects with the <strong>first settled</strong> promise (winner of the “race”).</p>
+  <pre><code>Promise.race([
+  new Promise(r => setTimeout(() => r("fast"), 500)),
+  new Promise(r => setTimeout(() => r("slow"), 1500))
+]).then(alert); // "fast"</code></pre>
+
+  <h4>4️⃣ Promise.any</h4>
+  <p>Returns the <strong>first fulfilled</strong> result. If all fail → rejects with <code>AggregateError</code>.</p>
+  <pre><code>Promise.any([
+  Promise.reject("fail"),
+  Promise.resolve("ok")
+]).then(alert); // "ok"</code></pre>
+
+  <h4>5️⃣ Promise.resolve</h4>
+  <p>Creates a resolved promise with a given value.</p>
+  <pre><code>Promise.resolve("ready").then(alert);</code></pre>
+
+  <h4>6️⃣ Promise.reject</h4>
+  <p>Creates a rejected promise with an error.</p>
+  <pre><code>Promise.reject(new Error("Oops")).catch(e => alert(e.message));</code></pre>
+
+  <div class="tip small">
+    💡 <strong>Most used:</strong> <code>Promise.all</code> – run tasks in parallel and wait for all results.
+  </div>
+</section>
+
 
       <section id="async-await">
-        <h3>Async/await patterns</h3>
-        <pre><code>async function getJson(url){
-  const r = await fetch(url);
-  if(!r.ok) throw new Error(r.status);
-  return r.json();
-}</code></pre>
-      </section>
+  <h3>Async / Await (Short Summary)</h3>
+  <p>
+    <code>async</code> and <code>await</code> make working with promises simpler and more readable.
+    <code>async</code> makes a function return a promise.
+    <code>await</code> pauses inside that function until the promise settles.
+  </p>
+
+  <h4>Async functions</h4>
+  <pre><code>async function f() {
+  return 1; // returns Promise.resolve(1)
+}
+f().then(alert); // 1</code></pre>
+
+  <h4>Await keyword</h4>
+  <pre><code>async function f() {
+  let promise = new Promise(r => setTimeout(() => r("done!"), 1000));
+  let result = await promise; // waits 1s
+  alert(result); // "done!"
+}
+f();</code></pre>
+
+  <h4>Error handling</h4>
+  <pre><code>async function f() {
+  try {
+    let r = await fetch("https://no-site.example");
+  } catch (err) {
+    alert("Error: " + err.message);
+  }
+}
+f();</code></pre>
+
+  <h4>Await + Promise.all</h4>
+  <pre><code>async function loadAll() {
+  let [a, b] = await Promise.all([
+    fetch("https://api.github.com/users/zeiadhabbab"),
+    fetch("https://api.github.com/users/zeiadhabbab")
+  ]);
+  alert("Both loaded!");
+}
+loadAll();</code></pre>
+
+  <ul>
+    <li><code>async</code> → always returns a Promise.</li>
+    <li><code>await</code> → waits for the promise and gives its result.</li>
+    <li>Use <code>try...catch</code> to handle errors inside async functions.</li>
+    <li>Combine with <code>Promise.all()</code> for parallel tasks.</li>
+  </ul>
+
+  <div class="tip small">
+    💡 <strong>Think of:</strong> <code>await</code> = “pause until ready”,  
+    <code>async</code> = “function that always returns a promise”.
+  </div>
+  <p>
+    <a href="https://www.youtube.com/watch?v=vM58HYbUqC0" target="_blank">Watch Async / Await Video Explanation Arabic</a>
+  </p>
+  <p>
+    <a href="https://www.youtube.com/watch?v=8fWit6bm1sY" target="_blank">Watch Async / Await Video Explanation </a>
+  </p>
+</section>
+
 
       <!-- PART 4 -->
       <section id="part4">
@@ -1248,7 +1864,7 @@ list.firstElementChild.textContent; // "A"</code></pre>
 
       <section id="searching">
         <h3>Searching: <code>getElement*</code>, <code>querySelector*</code></h3>
-        <pre><code>document.querySelectorAll('li').forEach(li =&gt; console.log(li.textContent));</code></pre>
+        <pre><code>document.querySelectorAll('li').forEach(li =&gt; alert(li.textContent));</code></pre>
       </section>
 
       <section id="node-props">
@@ -1285,7 +1901,7 @@ box.style.transform = 'scale(1.05)';</code></pre>
           <code>mousemove</code>, <code>keydown/keyup</code>, <code>DOMContentLoaded</code>, <code>scroll</code>.
         </p>
         <pre><code>document.addEventListener('DOMContentLoaded', () =&gt; {
-  document.body.addEventListener('click', e =&gt; console.log('Clicked', e.target));
+  document.body.addEventListener('click', e =&gt; alert('Clicked', e.target));
 });</code></pre>
       </section>
 
@@ -1293,7 +1909,7 @@ box.style.transform = 'scale(1.05)';</code></pre>
         <h3>Dispatching custom events</h3>
         <pre><code>const ev = new CustomEvent('user:login', { detail:{ id: 7 }});
 document.dispatchEvent(ev);
-document.addEventListener('user:login', e =&gt; console.log(e.detail));</code></pre>
+document.addEventListener('user:login', e =&gt; alert(e.detail));</code></pre>
       </section>
 
       <section id="forms">
@@ -1302,7 +1918,7 @@ document.addEventListener('user:login', e =&gt; console.log(e.detail));</code></
 form.addEventListener('submit', e =&gt; {
   e.preventDefault();
   const data = new FormData(form);
-  console.log(Object.fromEntries(data.entries()));
+  alert(Object.fromEntries(data.entries()));
 });</code></pre>
       </section>
 
@@ -1315,7 +1931,7 @@ form.addEventListener('submit', e =&gt; {
         <h3>Fetch</h3>
         <pre><code>fetch('/api/items')
   .then(r =&gt; r.json())
-  .then(items =&gt; console.log(items))
+  .then(items =&gt; alert(items))
   .catch(console.error);</code></pre>
       </section>
 
@@ -1348,7 +1964,7 @@ u.toString(); // "https://example.com/products?q=adapter"</code></pre>
         <p>Older API; still useful for progress events or legacy code.</p>
         <pre><code>const xhr = new XMLHttpRequest();
 xhr.open('GET','/api/data');
-xhr.onload = () =&gt; console.log(xhr.responseText);
+xhr.onload = () =&gt; alert(xhr.responseText);
 xhr.send();</code></pre>
       </section>
 
@@ -1374,7 +1990,7 @@ sessionStorage.clear();</code></pre>
         <p>Asynchronous, transactional key–value database in the browser.</p>
         <pre><code>const req = indexedDB.open('mydb',1);
 req.onupgradeneeded = (e) =&gt; e.target.result.createObjectStore('notes');
-req.onsuccess = () =&gt; console.log('DB ready');</code></pre>
+req.onsuccess = () =&gt; alert('DB ready');</code></pre>
       </section>
 
       <footer>

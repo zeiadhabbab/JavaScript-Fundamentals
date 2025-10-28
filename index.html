@@ -458,7 +458,6 @@
               <li><a href="#function-binding">Function binding</a></li>
               <li><a href="#try-catch">Error handling</a></li>
               <li><a href="#promises">Promises & async/await</a></li>
-              <li><a href="#promise-chaining">Promise chaining</a></li>
               <li><a href="#promise-errors">Promise error handling</a></li>
               <li><a href="#promise-api">Promise API</a></li>
               <li><a href="#async-await">Async/await patterns</a></li>
@@ -480,7 +479,6 @@
               <li><a href="#modifying">Modifying the document</a></li>
               <li><a href="#styles-classes">Styles & classes</a></li>
               <li><a href="#events">Browser events</a></li>
-              <li><a href="#custom-events">Custom events</a></li>
               <li><a href="#forms">Forms: properties & methods</a></li>
             </ol>
           </details>
@@ -1257,7 +1255,7 @@ for (let k in user3) alert(k); // name, surname, age</code></pre>
 
 
       <section id="object-entries">
-        <h3>Object.keys / values / entries</h3>
+        <h3>Object.keys / values</h3>
         <p>These methods are used to retrieve different aspects of an object's properties.</p>
         <pre><code>const person = {
   name: 'Alice',
@@ -1273,10 +1271,7 @@ alert(keys); // ['name', 'age', 'city']
 const values = Object.values(person);
 alert(values); // ['Alice', 30, 'New York']
 
-// Object.entries returns an array of key-value pairs
-const entries = Object.entries(person);
-alert(entries); // [['name', 'Alice'], ['age', 30], ['city', 'New York']]</code></pre>
-
+ 
       </section>
 
       <section id="date-time">

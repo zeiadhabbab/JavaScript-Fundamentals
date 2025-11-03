@@ -479,7 +479,6 @@
               <li><a href="#modifying">Modifying the document</a></li>
               <li><a href="#styles-classes">Styles & classes</a></li>
               <li><a href="#events">Browser events</a></li>
-              <li><a href="#forms">Forms: properties & methods</a></li>
             </ol>
           </details>
         </li>
@@ -1837,33 +1836,263 @@ loadAll();</code></pre>
       <!-- PART 4 -->
       <section id="part4">
         <h2>PART 4 · DOM</h2>
+        <p>
+          The Document Object Model (DOM) is a programming interface for HTML and XML documents. It represents the page structure as a tree of objects, allowing JavaScript to dynamically access and update content, structure, and styles.
+        </p>
+        <p>
+          This section covers the basics of DOM manipulation, including traversing the DOM tree, searching for elements, modifying content and attributes, handling styles and classes, and working with events.
+        </p>
       </section>
 
       <section id="browser-env">
         <h3>Browser environment & specs</h3>
-        <p>In the browser, JavaScript can manipulate the DOM, handle events, and make network requests—all defined by
-          Web APIs.</p>
+        <p>The JavaScript language was initially created for web browsers. Since then, it has evolved into a language with many uses and platforms.
+
+A platform may be a browser, or a web-server or another host, or even a “smart” coffee machine if it can run JavaScript. Each of these provides platform-specific functionality. The JavaScript specification calls that a host environment.
+
+A host environment provides its own objects and functions in addition to the language core. Web browsers give a means to control web pages. Node.js provides server-side features, and so on.</p>
+<p>
+  There’s a “root” object called window. It has two roles:
+  <pre><code>function sayHi() {
+  alert("Hello");
+}
+
+// global functions are methods of the global object:
+window.sayHi();</code></pre>
+</p>
+<pre><code>alert(window.innerHeight); // inner window height</code></pre>
+
+<h3>DOM (Document Object Model)</h3>
+<p>The Document Object Model, or DOM for short, represents all page content as objects that can be modified.
+
+The document object is the main “entry point” to the page. We can change or create anything on the page using it.</p>
+<pre><code>// change the background color to red
+document.body.style.background = "red";
+
+// change it back after 1 second
+setTimeout(() => document.body.style.background = "", 1000);</code></pre>
+
+<h3>BOM (Browser Object Model)</h3>
+<p>The Browser Object Model (BOM) is a collection of objects that provide browser-specific features. It includes objects like <code>window</code>, <code>navigator</code>, <code>location</code>, <code>history</code>, and <code>screen</code>.</p>
+
+<pre><code>alert(location.href); // shows current URL
+if (confirm("Go to Wikipedia?")) {
+  location.href = "https://wikipedia.org"; // redirect the browser to another URL
+}</code></pre>
+          
       </section>
 
       <section id="dom-tree">
         <h3>DOM tree</h3>
+        
         <p>The DOM is a tree of nodes representing the document structure.</p>
-        <pre><code>&lt;ul id="list"&gt;&lt;li&gt;A&lt;/li&gt;&lt;li&gt;B&lt;/li&gt;&lt;/ul&gt;</code></pre>
-      </section>
+        <pre><code>&lt;html&gt;
+    &lt;head&gt;
+        &lt;title&gt;My title&lt;/title&gt;
+    &lt;/head&gt;
+
+    &lt;body&gt;
+        &lt;a href=&quot;#&quot;&gt;My link&lt;/a&gt;
+        &lt;h1&gt;My header&lt;/h1&gt;
+    &lt;/body&gt;
+&lt;/html&gt;</code></pre>
+<img style="height: 400px;" src="https://programiz-pro-spaces.sfo3.digitaloceanspaces.com/programiz-static/programiz-blog/javascript-dom-tree.png" alt="DOM Tree Example">
+      
+<p><a href="https://software.hixie.ch/utilities/js/live-dom-viewer/">https://software.hixie.ch/utilities/js/live-dom-viewer/</a></p>
+
+ 
+</section>
 
       <section id="walking">
         <h3>Walking the DOM</h3>
+        <p>To navigate the DOM tree, we can use properties like <code>parentElement</code>, <code>children</code>, <code>firstElementChild</code>, <code>lastElementChild</code>, <code>nextElementSibling</code>, and <code>previousElementSibling</code>.</p>
         <pre><code>const list = document.getElementById('list');
 list.firstElementChild.textContent; // "A"</code></pre>
+
+<pre>&lt;html&gt; = document.documentElement</pre>
+<pre>&lt;body&gt;  = document.body</pre>
+<pre>&lt;head&gt;  = document.head</pre>
+<h3>Example</h3>
+<pre><code>&lt;html&gt;
+&lt;body&gt;
+  &lt;div&gt;Begin&lt;/div&gt;
+
+  &lt;ul&gt;
+    &lt;li&gt;Information&lt;/li&gt;
+  &lt;/ul&gt;
+
+  &lt;div&gt;End&lt;/div&gt;
+
+  &lt;script&gt;
+    for (let i = 0; i &lt; document.body.childNodes.length; i++) {
+      alert( document.body.childNodes[i] ); // Text, DIV, Text, UL, ..., SCRIPT
+    }
+  &lt;/script&gt;
+  ...more stuff...
+&lt;/body&gt;
+&lt;/html&gt;</code></pre>
+
+<p>Difference between Node object and Element object?</p>
+<p>Node object: represents any part of the document tree, like elements, text, comments, etc.
+  <br>
+Element object: specifically represents HTML elements and provides methods and properties for manipulating them.</p>
+
       </section>
 
       <section id="searching">
         <h3>Searching: <code>getElement*</code>, <code>querySelector*</code></h3>
-        <pre><code>document.querySelectorAll('li').forEach(li =&gt; alert(li.textContent));</code></pre>
-      </section>
+        <p>To search for elements in the DOM, we can use methods like <code>getElementById</code>, <code>getElementsByTagName</code>, <code>getElementsByClassName</code>, and <code>querySelector</code> (and its plural <code>querySelectorAll</code>).</p>
+        <pre><code>&lt;div id=&quot;elem&quot;&gt;
+  &lt;div id=&quot;elem-content&quot;&gt;Element&lt;/div&gt;
+&lt;/div&gt;
+
+&lt;script&gt;
+  // get the element
+  let elem = document.getElementById(&#39;elem&#39;);
+
+  // make its background red
+  elem.style.background = &#39;red&#39;;
+&lt;/script&gt;
+
+
+        </code></pre>
+
+        <p>Also, there’s a global variable named by id that references the element:</p>
+        <pre><code>&lt;div id=&quot;myDiv&quot;&gt;Hello&lt;/div&gt;
+&lt;script&gt;
+  alert(myDiv.textContent); // Hello
+&lt;/script&gt;</code></pre>
+
+<h3>querySelectorAll</h3>
+<p>To select multiple elements, we can use <code>querySelectorAll</code>. It returns a collection of elements that match the given selector.</p>
+<pre><code>&lt;ul&gt;
+  &lt;li&gt;The&lt;/li&gt;
+  &lt;li&gt;test&lt;/li&gt;
+&lt;/ul&gt;
+&lt;ul&gt;
+  &lt;li&gt;has&lt;/li&gt;
+  &lt;li&gt;passed&lt;/li&gt;
+&lt;/ul&gt;
+&lt;script&gt;
+  let elements = document.querySelectorAll(&#39;ul &gt; li:last-child&#39;);
+
+  for (let elem of elements) {
+    alert(elem.innerHTML); // &quot;test&quot;, &quot;passed&quot;
+  }
+&lt;/script&gt;
+</code></pre>
+
+
+<h3>querySelector</h3>
+<p>To select a single element, we can use <code>querySelector</code>. It returns the first element that matches the given selector.</p>
+<pre><code>&lt;div class=&quot;note&quot;&gt;First note
+&lt;/div&gt;
+&lt;div class=&quot;note&quot;&gt;Second note
+&lt;/div&gt;
+&lt;script&gt;
+  let firstNote = document.querySelector(&#39;.note&#39;);
+  alert(firstNote.innerHTML); // &quot;First note&quot;
+&lt;/script&gt;
+</code></pre>
+
+</section>
 
       <section id="node-props">
         <h3>Node properties: type, tag, contents</h3>
+    <p>
+    Every element, text, or comment in a web page is a <strong>DOM node</strong>. 
+    Each node belongs to a class in the DOM hierarchy that defines its properties and methods.
+  </p>
+
+  <h3>1. DOM Node Classes</h3>
+  <p>
+    The DOM is built on a class hierarchy:
+  </p>
+  <ul>
+    <li><code>EventTarget</code> – Base class that enables events.</li>
+    <li><code>Node</code> – Adds tree structure features (<code>parentNode</code>, <code>childNodes</code>).</li>
+    <li><code>Element</code> – Adds element-level features like <code>children</code> and <code>querySelector()</code>.</li>
+    <li><code>HTMLElement</code> – Base class for all HTML tags (<code>&lt;div&gt;</code>, <code>&lt;a&gt;</code>, etc.).</li>
+    <li>Specific classes like <code>HTMLInputElement</code>, <code>HTMLBodyElement</code>, etc., add tag-specific features.</li>
+  </ul>
+
+  <p>
+    Example:
+  </p>
+  <pre><code>let input = document.querySelector('input');
+alert(input.constructor.name); // HTMLInputElement
+</code></pre>
+
+  <h3>2. Identifying Node Type</h3>
+  <p>
+    The <code>nodeType</code> property tells what kind of node you’re working with:
+  </p>
+  <ul>
+    <li><code>1</code> → Element</li>
+    <li><code>3</code> → Text</li>
+    <li><code>9</code> → Document</li>
+  </ul>
+  <pre><code>alert(document.body.nodeType); // 1
+alert(document.body.firstChild.nodeType); // 3
+</code></pre>
+
+  <h3>3. Tag Name</h3>
+  <p>
+    You can get a node’s tag using <code>tagName</code> or <code>nodeName</code>:
+  </p>
+  <pre><code>alert(document.body.tagName); // BODY
+alert(document.body.nodeName); // BODY
+</code></pre>
+  <p>
+    <code>tagName</code> works only for elements, while <code>nodeName</code> also works for text or comment nodes.
+  </p>
+
+  <h3>4. innerHTML and outerHTML</h3>
+  <p>
+    <code>innerHTML</code> lets you read or replace the HTML inside an element.
+  </p>
+  <pre><code>document.body.innerHTML = "&lt;h1&gt;Welcome!&lt;/h1&gt;";</code></pre>
+  <p>
+    <code>outerHTML</code> includes the element itself. Writing to it replaces the element in the DOM.
+  </p>
+  <pre><code>div.outerHTML = "&lt;p&gt;Replaced!&lt;/p&gt;";</code></pre>
+
+  <h3>5. textContent and nodeValue</h3>
+  <p>
+    Use <code>textContent</code> to safely get or set plain text (no HTML tags).  
+    Use <code>nodeValue</code> or <code>data</code> to access the content of text or comment nodes.
+  </p>
+  <pre><code>elem.textContent = "&lt;b&gt;Safe text&lt;/b&gt;"; // shows literally, no bold
+</code></pre>
+
+  <h3>6. Hidden Property</h3>
+  <p>
+    The <code>hidden</code> attribute quickly hides elements, like <code>display:none</code> in CSS.
+  </p>
+  <pre><code>elem.hidden = true;</code></pre>
+
+  <h3>7. Common Node Properties</h3>
+  <ul>
+    <li><code>value</code> → for inputs</li>
+    <li><code>href</code> → for links</li>
+    <li><code>id</code> → for any element</li>
+  </ul>
+
+  <h3>Summary</h3>
+  <ul>
+    <li>Each DOM node belongs to a class and inherits properties from its hierarchy.</li>
+    <li><code>nodeType</code>, <code>tagName</code>, and <code>nodeName</code> help identify nodes.</li>
+    <li><code>innerHTML</code> and <code>outerHTML</code> handle HTML markup.</li>
+    <li><code>textContent</code> and <code>data</code> handle plain text safely.</li>
+    <li><code>hidden</code> quickly toggles visibility.</li>
+  </ul>
+
+  <div class="tip small">
+    💡 <strong>Tip:</strong> Use <code>textContent</code> to safely insert text, 
+    and <code>console.dir(element)</code> to inspect all its DOM properties.
+  </div>
+ 
+ 
         <pre><code>const p = document.createElement('p');
 p.nodeType;   // 1 = ELEMENT_NODE
 p.tagName;    // "P"</code></pre>
@@ -1871,51 +2100,321 @@ p.tagName;    // "P"</code></pre>
 
       <section id="attrs-props">
         <h3>Attributes &amp; properties</h3>
-        <pre><code>const img = document.createElement('img');
-img.setAttribute('alt','Logo');
-img.alt; // "Logo"</code></pre>
+   <p>
+    When the browser parses HTML, most <em>standard attributes</em> on elements become
+    JavaScript <strong>DOM properties</strong>. But they aren’t always identical, and not every
+    attribute becomes a property.
+  </p>
+
+  <h3>1) DOM Properties (JS side)</h3>
+  <ul>
+    <li>Live on the element object (regular JS object).</li>
+    <li>Typed values (e.g., <code>checked</code> is boolean, <code>style</code> is an object).</li>
+    <li>Case-sensitive names: use <code>elem.nodeType</code>, not <code>elem.NoDeTyPe</code>.</li>
+    <li>You can add your own: <code>document.body.myData = {name:'Caesar'}</code>.</li>
+  </ul>
+
+  <pre><code>// Custom property
+document.body.myData = { name: 'Caesar', title: 'Imperator' };
+console.log(document.body.myData.title); // Imperator
+
+// Prototype extension (affects all elements)
+Element.prototype.sayHi = function () {
+  console.log(`Hello, I'm &lt;${this.tagName.toLowerCase()}&gt;`);
+};
+document.body.sayHi(); // Hello, I'm &lt;body&gt;
+</code></pre>
+
+  <h3>2) HTML Attributes (markup side)</h3>
+  <ul>
+    <li>What you write in HTML.</li>
+    <li>Names are <em>case-insensitive</em>; values are always <em>strings</em>.</li>
+    <li>Some attributes are standard only for certain tags (e.g., <code>type</code> is standard on <code>&lt;input&gt;</code>, not on <code>&lt;body&gt;</code>).</li>
+  </ul>
+
+  <pre><code>&lt;div id="card" about="Elephant"&gt;&lt;/div&gt;
+&lt;script&gt;
+  const el = document.getElementById('card');
+  console.log(el.getAttribute('About')); // "Elephant" (case-insensitive)
+  el.setAttribute('data-note', 123);
+  for (const a of el.attributes) {
+    console.log(a.name, '=', a.value);
+  }
+&lt;/script&gt;
+</code></pre>
+
+  <h3>3) Working with Attributes (raw HTML values)</h3>
+  <ul>
+    <li><code>elem.hasAttribute(name)</code></li>
+    <li><code>elem.getAttribute(name)</code></li>
+    <li><code>elem.setAttribute(name, value)</code></li>
+    <li><code>elem.removeAttribute(name)</code></li>
+    <li><code>elem.attributes</code> → iterable list of all attributes</li>
+  </ul>
+
+  <h3>4) Sync Rules (Attribute ⇄ Property)</h3>
+  <p>
+    Standard attributes usually sync with their properties, but not always both ways:
+  </p>
+  <ul>
+    <li><strong>Two-way (usually):</strong> <code>id</code>
+      <pre><code>input.setAttribute('id', 'x'); console.log(input.id); // "x"
+input.id = 'y'; console.log(input.getAttribute('id')); // "y"</code></pre>
+    </li>
+    <li><strong>One-way:</strong> <code>value</code> (attribute → property only)
+      <pre><code>input.setAttribute('value', 'text'); console.log(input.value); // "text"
+input.value = 'new'; console.log(input.getAttribute('value')); // "text" (unchanged original)</code></pre>
+    </li>
+    <li><strong>Typed differences:</strong> <code>checked</code> is boolean vs attribute is string/empty
+      <pre><code>&lt;input type="checkbox" checked id="c"&gt;
+c.getAttribute('checked'); // ""  (string)
+c.checked;                 // true (boolean)</code></pre>
+    </li>
+    <li><strong>Normalized properties:</strong> <code>a.href</code> is always absolute
+      <pre><code>&lt;a id="link" href="#hash"&gt;
+link.getAttribute('href'); // "#hash"
+link.href;                 // "https://example.com/page#hash"</code></pre>
+    </li>
+    <li><strong>Objects:</strong> <code>style</code> attribute is string; <code>elem.style</code> is CSS object
+      <pre><code>div.getAttribute('style'); // "color:red;font-size:120%"
+div.style.color;          // "red"</code></pre>
+    </li>
+  </ul>
+
+  <h3>5) Custom Data: <code>data-*</code> & <code>dataset</code></h3>
+  <p>
+    Use <code>data-*</code> for safe, conflict-free custom attributes. Access them via <code>elem.dataset</code>
+    (camelCase for multi-word).
+  </p>
+  <pre><code>&lt;div id="order" class="order" data-order-state="new"&gt;A new order&lt;/div&gt;
+&lt;script&gt;
+  console.log(order.dataset.orderState); // "new"
+  order.dataset.orderState = 'pending';  // updates attribute and can drive CSS
+&lt;/script&gt;
+
+/* CSS */
+.order[data-order-state="pending"] { color: blue; }
+</code></pre>
+
+  <h3>6) Quick Guidance</h3>
+  <ul>
+    <li>Prefer <strong>properties</strong> for day-to-day JS (typed, live state).</li>
+    <li>Use <strong>attributes</strong> when you need the exact HTML value (<code>getAttribute</code>) or non-standard/custom data.</li>
+    <li>For custom data, use <strong><code>data-*</code></strong> + <strong><code>dataset</code></strong>.</li>
+    <li>Remember special sync cases (e.g., <code>value</code>).</li>
+  </ul>
+
+  <div class="tip small">
+    💡 <strong>Rule of thumb:</strong> Read/write <em>current UI state</em> via properties.
+    Read/write the <em>original markup</em> via attributes.
+  </div>
+ 
       </section>
 
       <section id="modifying">
-        <h3>Modifying the document</h3>
-        <pre><code>const li = document.createElement('li');
-li.textContent = 'C';
-document.querySelector('#list').append(li);</code></pre>
+  <h2>Modifying the Document (DOM)</h2>
+  <p>
+    Create elements, insert them in precise positions, clone or remove nodes, and safely inject HTML or text.
+  </p>
+
+  <h3>1) Create Nodes</h3>
+  <ul>
+    <li><code>document.createElement(tag)</code> → element node</li>
+    <li><code>document.createTextNode(text)</code> → text node</li>
+  </ul>
+  <pre><code>// Build: &lt;div class="alert"&gt;&lt;strong&gt;Hi!&lt;/strong&gt; You’ve got a message.&lt;/div&gt;
+const box = document.createElement('div');
+box.className = 'alert';
+box.innerHTML = '&lt;strong&gt;Hi!&lt;/strong&gt; You’ve got a message.';
+</code></pre>
+
+  <h3>2) Insert Nodes (Modern)</h3>
+  <ul>
+    <li><code>parent.append(...nodes|strings)</code> – end of parent</li>
+    <li><code>parent.prepend(...)</code> – start of parent</li>
+    <li><code>node.before(...)</code> / <code>node.after(...)</code> – around node</li>
+    <li><code>node.replaceWith(...)</code> – replace node</li>
+  </ul>
+  <pre><code>document.body.prepend(box);             // show at top
+box.after(' (inline text)', document.createElement('hr'));</code></pre>
+  <p class="note">Strings are inserted as <em>text</em> (escaped), not HTML.</p>
+
+  <h3>3) Insert as HTML</h3>
+  <p>Use <code>elem.insertAdjacentHTML(where, html)</code> for literal HTML.</p>
+  <ul>
+    <li><code>"beforebegin"</code> | <code>"afterbegin"</code> | <code>"beforeend"</code> | <code>"afterend"</code></li>
+  </ul>
+  <pre><code>box.insertAdjacentHTML('beforeend', '&lt;em&gt; Read this.&lt;/em&gt;');</code></pre>
+
+  <h3>4) Remove / Move</h3>
+  <ul>
+    <li><code>node.remove()</code> – delete node</li>
+    <li>Re-inserting a node <em>moves</em> it automatically (no manual remove needed)</li>
+  </ul>
+  <pre><code>setTimeout(() => box.remove(), 1500);</code></pre>
+
+  <h3>5) Clone</h3>
+  <ul>
+    <li><code>elem.cloneNode(true)</code> – deep clone (with children)</li>
+    <li><code>elem.cloneNode(false)</code> – shallow clone</li>
+  </ul>
+  <pre><code>const copy = box.cloneNode(true);
+copy.querySelector('strong').textContent = 'Bye!';
+box.after(copy);</code></pre>
+
+  <h3>6) Batching</h3>
+  <p>
+    Build lists off-DOM, then append once. Either:
+    <code>DocumentFragment</code> or just collect nodes in an array and spread.
+  </p>
+  <pre><code>// Array approach (simple, fast)
+const items = Array.from({length: 3}, (_, i) => {
+  const li = document.createElement('li');
+  li.textContent = i + 1;
+  return li;
+});
+document.querySelector('#list').append(...items);</code></pre>
+
+  <h3>7) Legacy Methods (know them, don’t start with them)</h3>
+  <p><code>appendChild</code>, <code>insertBefore</code>, <code>replaceChild</code>, <code>removeChild</code> exist for older codebases.</p>
+
+  <h3>8) ⚠️ Avoid <code>document.write</code></h3>
+  <p>
+    Only works during initial parsing; calling later wipes the page. Prefer the modern APIs above.
+  </p>
+
+  <div class="tip small">
+    💡 <strong>Cheat sheet:</strong> Build with <code>createElement</code> → insert with <code>append/prepend/before/after</code> →
+    HTML string? use <code>insertAdjacentHTML</code> → batch many nodes → clone with <code>cloneNode</code> → remove with <code>remove()</code>.
+  </div>
+
       </section>
 
       <section id="styles-classes">
-        <h3>Styles &amp; classes</h3>
-        <pre><code>const box = document.querySelector('#box');
-box.classList.add('highlight');
-box.style.transform = 'scale(1.05)';</code></pre>
-      </section>
+   <h2>Styles & Classes</h2>
+  <p>
+    Prefer CSS classes for presentation. Use inline <code>style</code> from JS only when values are dynamic (e.g., computed positions).
+  </p>
+
+  <h3>1) Prefer Classes over Inline Styles</h3>
+  <pre><code>/* CSS */
+.btn { padding: .5rem 1rem; background: #0a7; color: #fff; }
+
+/* JS: add the class instead of manual inline styling */
+elem.classList.add('btn');</code></pre>
+
+  <h3>2) className vs classList</h3>
+  <ul>
+    <li><code>elem.className</code> → full class string (overwrites all).</li>
+    <li><code>elem.classList</code> → add/remove/toggle one class at a time.</li>
+  </ul>
+  <pre><code>// className (replace all)
+elem.className = 'card card--primary';
+
+// classList (surgical)
+elem.classList.add('is-active');
+elem.classList.remove('is-hidden');
+elem.classList.toggle('dark');
+elem.classList.contains('dark'); // true/false
+
+// Iterate classes
+for (const c of elem.classList) console.log(c);</code></pre>
+
+  <h3>3) Inline Styles (when you must)</h3>
+  <p>Use camelCase for multi-word properties. Remember units (<code>px</code>, <code>%</code>, etc.).</p>
+  <pre><code>elem.style.backgroundColor = 'gold';
+elem.style.zIndex = '10';
+elem.style.left = leftPx + 'px';
+elem.style.top  = topPx + 'px';</code></pre>
+
+  <h4>Reset or Remove an Inline Style</h4>
+  <pre><code>// reset one property
+elem.style.display = '';                 // restores CSS/UA default
+elem.style.removeProperty('background'); // remove explicitly-set inline style
+
+// set many at once (replaces all inline styles!)
+elem.style.cssText = `
+  color: red !important;
+  background-color: #ffe;
+  padding: 8px;
+`;</code></pre>
+
+   
+
+  <div class="tip small">
+    💡 <strong>Cheat sheet:</strong> Style with CSS → toggle via <code>classList</code> →
+    inline <code>style</code> only for dynamic numbers/positions → reset with <code>''</code> or
+    <code>removeProperty</code> → read final values with <code>getComputedStyle</code>.
+  </div>
+</section>
+
 
       <section id="events">
-        <h3>Introduction to browser events</h3>
-        <p>Common events: <code>click</code>, <code>mouseover/mouseout</code>, <code>mousedown/mouseup</code>,
-          <code>mousemove</code>, <code>keydown/keyup</code>, <code>DOMContentLoaded</code>, <code>scroll</code>.
-        </p>
-        <pre><code>document.addEventListener('DOMContentLoaded', () =&gt; {
-  document.body.addEventListener('click', e =&gt; alert('Clicked', e.target));
-});</code></pre>
-      </section>
+   <h2>Introduction to Browser Events</h2>
+  <p>
+    An <strong>event</strong> signals that something happened (click, key press, form submit, etc.). 
+    Handlers are functions that run in response.
+  </p>
 
-      <section id="custom-events">
-        <h3>Dispatching custom events</h3>
-        <pre><code>const ev = new CustomEvent('user:login', { detail:{ id: 7 }});
-document.dispatchEvent(ev);
-document.addEventListener('user:login', e =&gt; alert(e.detail));</code></pre>
-      </section>
+  <h3>Common Event Types</h3>
+  <ul>
+    <li><strong>Mouse:</strong> <code>click</code>, <code>contextmenu</code>, <code>mouseover</code>/<code>mouseout</code>, <code>mousedown</code>/<code>mouseup</code>, <code>mousemove</code></li>
+    <li><strong>Keyboard:</strong> <code>keydown</code>, <code>keyup</code></li>
+    <li><strong>Form:</strong> <code>submit</code>, <code>focus</code></li>
+    <li><strong>Document:</strong> <code>DOMContentLoaded</code></li>
+    <li><strong>CSS:</strong> <code>transitionend</code></li>
+  </ul>
 
-      <section id="forms">
-        <h3>Form properties &amp; methods</h3>
-        <pre><code>const form = document.querySelector('form');
-form.addEventListener('submit', e =&gt; {
-  e.preventDefault();
-  const data = new FormData(form);
-  alert(Object.fromEntries(data.entries()));
+  <h3>Ways to Attach Handlers</h3>
+  <ol>
+    <li>
+      <strong>HTML attribute</strong> (quick demos; avoid for real apps):
+      <pre><code>&lt;input type="button" value="Click" onclick="sayHi()"&gt;</code></pre>
+    </li>
+    <li>
+      <strong>DOM property</strong> (one handler per event):
+      <pre><code>button.onclick = function () { alert('Thanks'); };
+button.onclick = null; // remove</code></pre>
+    </li>
+    <li>
+      <strong>addEventListener</strong> (multiple handlers + options):
+      <pre><code>function handler(e){ console.log(e.type); }
+button.addEventListener('click', handler, { once: true });
+button.removeEventListener('click', handler);</code></pre>
+      <small>Use for events like <code>DOMContentLoaded</code> (not available via <code>onDOMContentLoaded</code>).</small>
+    </li>
+  </ol>
+
+  <h3>The Event Object</h3>
+  <pre><code>button.addEventListener('click', function (event) {
+  console.log(event.type);               // "click"
+  console.log(event.currentTarget === this); // true (except in arrow functions)
+  console.log(event.clientX, event.clientY); // mouse coords
 });</code></pre>
-      </section>
+  <p class="note">In HTML attributes, <code>event</code> is also available: <code>onclick="alert(event.type)"</code>.</p>
+
+   
+
+  <h3>Gotchas & Tips</h3>
+  <ul>
+    <li>Assign the function, don’t call it: <code>btn.onclick = sayHi</code> (✅), not <code>sayHi()</code> (❌).</li>
+    <li><code>removeEventListener</code> needs the <em>same</em> function reference used to add.</li>
+    <li>Prefer <code>addEventListener</code> for composability and special events.</li>
+    <li>Use options:
+      <code>{ once: true }</code> auto-removes,
+      <code>{ passive: true }</code> for scroll/touch (no <code>preventDefault()</code>),
+      <code>{ capture: true }</code> to handle in capture phase.</li>
+  </ul>
+
+  <div class="tip small">
+    💡 <strong>Cheat sheet:</strong> Use <code>addEventListener</code> → keep a named handler for removal →
+    read details from <code>event</code> → avoid inline HTML handlers in production.
+  </div>
+</section>
+
+ 
+
+       
 
       <!-- PART 5 -->
       <section id="part5">

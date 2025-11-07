@@ -490,9 +490,6 @@
             <ol>
               <li><a href="#fetch">Fetch</a></li>
               <li><a href="#formdata">FormData</a></li>
-              <li><a href="#fetch-api">Fetch API patterns</a></li>
-              <li><a href="#url">URL objects</a></li>
-              <li><a href="#xhr">XMLHttpRequest</a></li>
             </ol>
           </details>
         </li>
@@ -502,9 +499,7 @@
           <details>
             <summary>Persistence</summary>
             <ol>
-              <li><a href="#cookies">Cookies</a></li>
-              <li><a href="#storage">localStorage / sessionStorage</a></li>
-              <li><a href="#indexeddb">IndexedDB</a></li>
+              <li><a href="#localstorage">localStorage</a></li>
             </ol>
           </details>
         </li>
@@ -2419,73 +2414,294 @@ button.removeEventListener('click', handler);</code></pre>
       <!-- PART 5 -->
       <section id="part5">
         <h2>PART 5 · Network Requests</h2>
+        <p>Network requests allow web apps to fetch data from servers.</p>
+        <p>Commonly used for fetching JSON data from APIs.</p>
+        <p>Fetch API is modern, Promise-based; supports JSON, FormData, Blobs, etc. </p>
       </section>
 
       <section id="fetch">
-        <h3>Fetch</h3>
-        <pre><code>fetch('/api/items')
-  .then(r =&gt; r.json())
-  .then(items =&gt; alert(items))
-  .catch(console.error);</code></pre>
-      </section>
+  <h2>Fetch</h2>
+  <p>
+    <code>fetch()</code> lets JavaScript make network requests without reloading the page
+    (a.k.a. “AJAX”). Use it to submit forms, load user data, or grab live updates.
+  </p>
+
+  <h3>Quick start</h3>
+  <pre><code class="language-js">// Basic GET (2-stage: headers → body)
+const res = await fetch('/api/users');
+if (!res.ok) throw new Error(`HTTP ${res.status}`);
+const data = await res.json(); // or .text() / .blob() / .arrayBuffer() / .formData()</code></pre>
+
+  <div class="note small">
+    ✅ <strong>Body can be read once.</strong> Choose one: <code>.json()</code>, <code>.text()</code>, <code>.blob()</code>, etc.
+  </div>
+
+  <h3>Response essentials</h3>
+  <ul>
+    <li><code>res.status</code> → HTTP status (e.g. 200, 404)</li>
+    <li><code>res.ok</code> → <code>true</code> for 200–299</li>
+    <li><code>res.headers</code> → Map-like headers (<code>get()</code>, iterable)</li>
+  </ul>
+  <pre><code class="language-js">console.log(res.headers.get('content-type'));
+for (const [k, v] of res.headers) console.log(k, v);</code></pre>
+
+  <h3>Sending requests</h3>
+  <h4>JSON POST</h4>
+  <pre><code class="language-js">const payload = { name: 'John', surname: 'Smith' };
+const res = await fetch('/api/users', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json;charset=utf-8' },
+  body: JSON.stringify(payload)
+});
+const result = await res.json();</code></pre>
+
+  <h4>Binary / FormData</h4>
+  <pre><code class="language-js">// Blob (e.g., from canvas.toBlob or a file input)
+const res = await fetch('/upload', { method: 'POST', body: myBlob });
+// FormData auto-sets headers (don’t set Content-Type manually)
+const fd = new FormData();
+fd.append('avatar', fileInput.files[0]);
+const res2 = await fetch('/upload', { method: 'POST', body: fd });</code></pre>
+
+  <h3>Error handling (robust pattern)</h3>
+  <pre><code class="language-js">async function httpJson(url, opts = {}) {
+  const res = await fetch(url, opts);
+  // Network errors throw; non-2xx do NOT → check .ok yourself
+  if (!res.ok) {
+    const msg = await res.text().catch(() => '');
+    throw new Error(`HTTP ${res.status} ${res.statusText} – ${msg}`);
+  }
+  const ct = res.headers.get('content-type') || '';
+  return ct.includes('application/json') ? res.json() : res.text();
+}
+
+try {
+  const data = await httpJson('https://api.github.com/users/iliakan');
+  console.log(data);
+} catch (err) {
+  console.error(err);
+}</code></pre>
+ 
+  
+
+  <h3>Headers</h3>
+  <p>Set request headers via <code>headers</code>. Some are forbidden (e.g., <code>Content-Length</code>, <code>Origin</code>, <code>Referer</code>, <code>Cookie</code>, <code>Sec-*</code>), the browser manages those.</p>
+  <pre><code class="language-js">await fetch('/secure', { headers: { Authorization: 'Bearer &lt;token&gt;' } });</code></pre>
+
+  <h3>Common pitfalls</h3>
+  <ul>
+    <li>Non-2xx statuses don’t throw → always check <code>res.ok</code>.</li>
+    <li>Read the body once; choose a single method (<code>.json()</code>, <code>.text()</code>, …).</li>
+    <li>CORS is enforced by the browser—server must allow your origin/method/headers.</li>
+    <li>Don’t manually set <code>Content-Type</code> for <code>FormData</code> or most <code>Blob</code>s.</li>
+  </ul>
+
+  <h3>Cheat sheet</h3>
+  <pre><code class="language-js">// GET
+await fetch(url).then(r => r.json());
+
+// POST JSON
+await fetch(url, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(data) });
+
+// Text / Blob
+const txt  = await (await fetch(url)).text();
+const blob = await (await fetch(url)).blob();
+
+// Headers
+const res = await fetch(url);
+res.headers.get('content-type');
+
+</code></pre>
+</section>
+
 
       <section id="formdata">
-        <h3>FormData</h3>
-        <pre><code>const fd = new FormData();
-fd.append('file', new Blob(['hello'], {type:'text/plain'}), 'greet.txt');</code></pre>
-      </section>
+  <h2>FormData</h2>
+  <p>
+    <strong>FormData</strong> is a built-in JavaScript object used to collect and send form data — including files —
+    to a server using <code>fetch()</code> or other network methods. It automatically encodes data as
+    <code>multipart/form-data</code>, just like a regular form submission.
+  </p>
 
-      <section id="fetch-api">
-        <h3>Fetch API patterns</h3>
-        <pre><code>const jsonPost = (url, body) =&gt; fetch(url, {
-  method:'POST', headers:{'Content-Type':'application/json'},
-  body: JSON.stringify(body)
-}).then(r =&gt; {
-  if(!r.ok) throw new Error(r.status);
-  return r.json();
-});</code></pre>
-      </section>
+  <h3>Creating FormData</h3>
+  <pre><code class="language-js">// Create from an existing form
+const formData = new FormData(document.querySelector('#myForm'));
 
-      <section id="url">
-        <h3>URL objects</h3>
-        <pre><code>const u = new URL('https://example.com/products');
-u.searchParams.set('q','adapter');
-u.toString(); // "https://example.com/products?q=adapter"</code></pre>
-      </section>
+// Or create manually
+const fd = new FormData();
+fd.append('name', 'John');
+fd.append('surname', 'Smith');</code></pre>
 
-      <section id="xhr">
-        <h3>XMLHttpRequest</h3>
-        <p>Older API; still useful for progress events or legacy code.</p>
-        <pre><code>const xhr = new XMLHttpRequest();
-xhr.open('GET','/api/data');
-xhr.onload = () =&gt; alert(xhr.responseText);
-xhr.send();</code></pre>
-      </section>
+  <h3>Sending a Simple Form</h3>
+  <pre><code class="language-html">&lt;form id="userForm"&gt;
+  &lt;input type="text" name="name" value="John"&gt;
+  &lt;input type="text" name="surname" value="Smith"&gt;
+  &lt;input type="submit"&gt;
+&lt;/form&gt;
 
+&lt;script&gt;
+userForm.onsubmit = async (e) =&gt; {
+  e.preventDefault();
+  const res = await fetch('/api/users', {
+    method: 'POST',
+    body: new FormData(userForm)
+  });
+  const result = await res.json();
+  alert(result.message);
+};
+&lt;/script&gt;</code></pre>
+
+  <h3>FormData Methods</h3>
+  <ul>
+    <li><code>append(name, value)</code> – Add a new field.</li>
+    <li><code>append(name, blob, fileName)</code> – Add a file field (like <code>&lt;input type="file"&gt;</code>).</li>
+    <li><code>set(name, value)</code> – Replace existing field(s) with a new one.</li>
+    <li><code>delete(name)</code> – Remove a field.</li>
+    <li><code>get(name)</code> – Read a field’s value.</li>
+    <li><code>has(name)</code> – Check if a field exists.</li>
+  </ul>
+  <p><small><strong>Note:</strong> <code>append()</code> adds another field with the same name; 
+  <code>set()</code> replaces all previous ones.</small></p>
+
+  <h4>Example – Iterating through fields</h4>
+  <pre><code class="language-js">const fd = new FormData();
+fd.append('key1', 'value1');
+fd.append('key2', 'value2');
+
+for (const [name, value] of fd) {
+  console.log(name, value);
+}</code></pre>
+
+ 
+
+ 
+
+  <h3>Summary</h3>
+  <ul>
+    <li><code>new FormData(form)</code> captures all fields of an HTML form.</li>
+    <li>Use <code>append()</code> and <code>set()</code> to add fields or files.</li>
+    
+ 
+   </ul>
+
+   
+</section>
+
+
+   
+       
       <!-- PART 6 -->
       <section id="part6">
         <h2>PART 6 · Storing Data in the Browser</h2>
+        <p>Web storage APIs let you store data locally in the browser for later use. </p>
+        <p>Common options are <code>localStorage</code> (persistent) and <code>sessionStorage</code> (per-tab).</p>
       </section>
 
-      <section id="cookies">
-        <h3>Cookies &amp; <code>document.cookie</code></h3>
-        <pre><code>document.cookie = "theme=dark; Path=/; Max-Age=31536000";</code></pre>
-      </section>
+    
 
-      <section id="storage">
-        <h3>localStorage &amp; sessionStorage</h3>
-        <pre><code>localStorage.setItem('lang','en');
-localStorage.getItem('lang'); // "en"
-sessionStorage.clear();</code></pre>
-      </section>
+      <section id="localstorage">
+  <h2>LocalStorage</h2>
+  <p>
+    <strong>localStorage</strong> is a built-in web storage object that lets you store 
+    key–value pairs in the browser <em>permanently</em> (until manually deleted).  
+    Data in <code>localStorage</code>:
+  </p>
+  <ul>
+    <li>Persists after page refresh or browser restart.</li>
+    <li>Is shared across all tabs and windows from the same origin (domain + protocol + port).</li>
+    <li>Is not sent to the server with requests (unlike cookies).</li>
+    <li>Can typically store 5–10 MB of data (depending on browser).</li>
+  </ul>
 
-      <section id="indexeddb">
-        <h3>IndexedDB</h3>
-        <p>Asynchronous, transactional key–value database in the browser.</p>
-        <pre><code>const req = indexedDB.open('mydb',1);
-req.onupgradeneeded = (e) =&gt; e.target.result.createObjectStore('notes');
-req.onsuccess = () =&gt; alert('DB ready');</code></pre>
-      </section>
+  <h3>Basic API</h3>
+  <ul>
+    <li><code>setItem(key, value)</code> – store a value.</li>
+    <li><code>getItem(key)</code> – retrieve a value.</li>
+    <li><code>removeItem(key)</code> – delete a specific key.</li>
+    <li><code>clear()</code> – remove all keys.</li>
+    <li><code>key(index)</code> – get the key name by index.</li>
+    <li><code>length</code> – number of stored entries.</li>
+  </ul>
+
+  <h4>Example</h4>
+  <pre><code class="language-js">localStorage.setItem('user', 'John');
+console.log(localStorage.getItem('user')); // "John"
+
+localStorage.removeItem('user');
+localStorage.clear(); // remove everything</code></pre>
+
+  <h3>Object-like access (not recommended)</h3>
+  <pre><code class="language-js">localStorage.test = 123;
+console.log(localStorage.test); // 123
+delete localStorage.test;</code></pre>
+  <p>
+    This works, but is <strong>not safe</strong> if the key overlaps with built-in names (e.g. <code>length</code>, <code>toString</code>).
+    Always prefer <code>getItem()</code>/<code>setItem()</code>.
+  </p>
+
+  <h3>Looping over keys</h3>
+  <pre><code class="language-js">// by index
+for (let i = 0; i < localStorage.length; i++) {
+  const key = localStorage.key(i);
+  console.log(key, localStorage.getItem(key));
+}
+
+// or with Object.keys
+for (const key of Object.keys(localStorage)) {
+  console.log(key, localStorage.getItem(key));
+}</code></pre>
+
+  <h3>Strings only</h3>
+  <p>
+    Both key and value must be strings.  
+    To store objects, use <code>JSON.stringify()</code> and <code>JSON.parse()</code>.
+  </p>
+  <pre><code class="language-js">// store object
+const user = { name: 'John', age: 25 };
+localStorage.setItem('user', JSON.stringify(user));
+
+// read object
+const stored = JSON.parse(localStorage.getItem('user'));
+console.log(stored.name); // John</code></pre>
+
+  <h3>Storage Event (multi-tab sync)</h3>
+  <p>
+    When <code>localStorage</code> changes in one tab, 
+    other tabs (on the same origin) receive a <code>storage</code> event.
+  </p>
+  <pre><code class="language-js">window.addEventListener('storage', e => {
+  console.log('Changed:', e.key, e.oldValue, '→', e.newValue, 'from', e.url);
+});
+
+// in another tab
+localStorage.setItem('theme', 'dark');</code></pre>
+  <p>
+    This enables simple communication between browser tabs.
+  </p>
+
+  <h3>Practical Uses</h3>
+  <ul>
+    <li>Save user preferences (e.g., theme, language).</li>
+    <li>Cache small JSON data or API responses for faster reloads.</li>
+    <li>Remember form input or app state between sessions.</li>
+  </ul>
+
+  <h3>Summary</h3>
+  <table>
+    <tr><th>Feature</th><th>localStorage</th></tr>
+    <tr><td>Scope</td><td>All tabs/windows on the same origin</td></tr>
+    <tr><td>Lifetime</td><td>Until manually cleared</td></tr>
+    <tr><td>Size limit</td><td>≈ 5 MB per origin</td></tr>
+    <tr><td>Data type</td><td>String (convert objects using JSON)</td></tr>
+    <tr><td>Event</td><td><code>storage</code> (syncs across tabs)</td></tr>
+  </table>
+
+  <div class="tip small">
+    💡 <strong>Tip:</strong> Use <code>localStorage</code> for small, persistent data.  
+    Use <code>sessionStorage</code> for temporary, tab-specific data.
+  </div>
+</section>
+
 
       <footer>
 
